@@ -1,11 +1,12 @@
 <!--
 Rapporto di Impatto Sincronizzazione:
-- Versione: 0.0.0 → 1.0.0 (Costituzione iniziale)
-- Ratifica: 2025-10-15
-- Principi modificati: N/A (versione iniziale)
-- Sezioni aggiunte: Tutte (versione iniziale)
-- Template che richiedono aggiornamenti: Nessuno (la costituzione iniziale stabilisce la baseline)
-- TODO da completare: Nessuno
+- Versione: 1.0.0 → 1.1.0 (Aggiunta principio Osservabilità)
+- Ultima modifica: 2025-10-15
+- Principi aggiunti: V. Osservabilità (logging obbligatorio con libreria dedicata)
+- Principi modificati: Nessuno
+- Sezioni rimosse: Nessuna
+- Template che richiedono aggiornamenti: Nessuno (principio non impatta template)
+- Follow-up: Principio V dichiara esplicitamente violazione di Principio III (libreria logging permessa)
 -->
 
 # Costituzione RFI POC
@@ -35,6 +36,12 @@ Rapporto di Impatto Sincronizzazione:
 **Regola**: Nessuno step di build richiesto per lo sviluppo o il deployment. Se vengono introdotti strumenti di build (bundler, transpiler), documentare perché l'approccio vanilla era insufficiente.
 
 **Motivazione**: Semplifica il workflow di sviluppo, riduce l'overhead degli strumenti, abilita la modifica diretta dei file e mantiene cicli di iterazione rapidi. I browser moderni supportano ES6+ nativamente.
+
+### V. Osservabilità
+
+**Regola**: Tutto ciò che fanno gli script deve essere chiaramente loggato sulla console del browser. Utilizza una libreria di logging (anche se questo viola il principio III) che permetta di configurare il livello di gravità dei messaggi ed eventualmente altre destinazioni di output dei messaggi.
+
+**Motivazione**: Semplifica il workflow di sviluppo in quanto aiuta il debugging.
 
 ## Workflow di Sviluppo
 
@@ -86,4 +93,4 @@ Qualsiasi violazione dei principi fondamentali (aggiunta di framework, strumenti
 - I comandi SpecKit (`/speckit.plan`, `/speckit.analyze`) verificheranno l'allineamento con la costituzione
 - Mantenere la costituzione come singola fonte di verità per le decisioni architetturali
 
-**Versione**: 1.0.0 | **Ratificata**: 2025-10-15 | **Ultima Modifica**: 2025-10-15
+**Versione**: 1.1.0 | **Ratificata**: 2025-10-15 | **Ultima Modifica**: 2025-10-15
