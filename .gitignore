@@ -31,3 +31,11 @@ desktop.ini
 # Specify feature specs (keep in repo but may want to ignore certain temp files)
 specs/**/*.tmp
 specs/**/*.bak
+
+# Node modules
+node_modules/
+
+# Playwright
+playwright-report/
+test-results/
+playwright/.cache/
