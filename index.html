@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulatore Chiosco Ingresso</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <div class="chiosco-container">
+        <!-- Header -->
+        <header class="chiosco-header">
+            <h1>🚪 Chiosco Ingresso</h1>
+            <p>Simulatore di pagamento e controllo accessi</p>
+        </header>
+
+        <!-- Layout Principale -->
+        <div class="chiosco-layout">
+            <!-- Display -->
+            <div class="display-area">
+                <div class="display" id="display">
+                    <div class="display-message" id="display-message">
+                        Benvenuto - Scegli modalità di accesso
+                    </div>
+                    <div class="display-amount hidden" id="display-amount"></div>
+                    <div class="display-countdown hidden" id="display-countdown"></div>
+                </div>
+            </div>
+
+            <!-- Area Input (Sinistra) -->
+            <div class="input-area">
+                <!-- Gettoniera -->
+                <div class="gettoniera">
+                    <h3>💰 Gettoniera</h3>
+                    <div class="monete-grid" id="monete-grid">
+                        <button class="btn-moneta" data-valore="1.00">1,00€</button>
+                        <button class="btn-moneta" data-valore="0.50">0,50€</button>
+                        <button class="btn-moneta" data-valore="0.20">0,20€</button>
+                        <button class="btn-moneta" data-valore="0.10">0,10€</button>
+                        <button class="btn-moneta" data-valore="0.05">0,05€</button>
+                        <button class="btn-moneta" data-valore="0.02">0,02€</button>
+                        <button class="btn-moneta" data-valore="0.01">0,01€</button>
+                    </div>
+                </div>
+
+                <!-- Lettore Carte -->
+                <div class="lettore-carte">
+                    <h3>💳 Lettore Carte</h3>
+                    <div class="carta-buttons">
+                        <button class="btn-carta" id="btn-paga-carta">Paga con Carta</button>
+                        <button class="btn-carta verifica" id="btn-verifica-carta">Verifica Carta Autorizzata</button>
+                    </div>
+                    <div class="carta-area hidden" id="carta-area">
+                        <p>👆 Avvicina la carta qui</p>
+                    </div>
+                    <div class="carta-input hidden" id="carta-input">
+                        <input type="text" class="input-qr" id="input-carta" placeholder="Codice carta (es. 42)">
+                        <button class="btn-qr" id="btn-verifica-carta-submit">Verifica</button>
+                    </div>
+                </div>
+
+                <!-- Lettore QR -->
+                <div class="lettore-qr">
+                    <h3>📱 Lettore QR</h3>
+                    <div class="qr-input-group">
+                        <input type="text" class="input-qr" id="input-qr" placeholder="Inserisci codice QR (es. 42)">
+                        <button class="btn-qr" id="btn-scansiona-qr">Scansiona QR</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Porta (Destra) -->
+            <div class="porta-area">
+                <div>
+                    <div class="porta-container">
+                        <div class="porta chiusa" id="porta">
+                            🚪 PORTA
+                        </div>
+                    </div>
+                    <div class="porta-status chiusa" id="porta-status">
+                        🔒 Chiusa
+                    </div>
+                    <button class="btn-passaggio hidden" id="btn-passaggio-persona" title="Clicca dopo aver attraversato">
+                        🚶 Persona passata
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="assets/lib/loglevel.min.js"></script>
+
+    <!-- JavaScript Modules -->
+    <script src="js/logger.js"></script>
+    <script src="js/validatore.js"></script>
+    <script src="js/display.js"></script>
+    <script src="js/porta.js"></script>
+    <script src="js/gettoniera.js"></script>
+    <script src="js/lettore-carte.js"></script>
+    <script src="js/lettore-qr.js"></script>
+    <script src="js/chiosco.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

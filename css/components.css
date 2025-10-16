@@ -1,0 +1,325 @@
+/**
+ * Stili Componenti Hardware - Simulatore Chiosco Ingresso
+ * Stili per display, gettoniera, lettori, porta
+ */
+
+/* ========== DISPLAY ========== */
+.display {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  color: #fff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.display-message {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.display-amount {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #4ade80;
+}
+
+.display-countdown {
+  font-size: 1.2rem;
+  color: #fbbf24;
+  margin-top: 10px;
+}
+
+.display.successo {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.display.errore {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+/* ========== GETTONIERA ========== */
+.gettoniera {
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 15px;
+  padding: 20px;
+}
+
+.gettoniera h3 {
+  font-size: 1.3rem;
+  color: #374151;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.monete-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 10px;
+}
+
+.btn-moneta {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #78350f;
+  border: none;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-moneta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-moneta:active {
+  transform: scale(0.95);
+}
+
+.btn-moneta:disabled {
+  background: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ========== LETTORE CARTE ========== */
+.lettore-carte {
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 15px;
+  padding: 20px;
+}
+
+.lettore-carte h3 {
+  font-size: 1.3rem;
+  color: #374151;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.carta-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-carta {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 15px 20px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-carta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-carta:active {
+  transform: scale(0.98);
+}
+
+.btn-carta:disabled {
+  background: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-carta.verifica {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.carta-area {
+  margin-top: 15px;
+  padding: 40px;
+  border: 3px dashed #d1d5db;
+  border-radius: 10px;
+  text-align: center;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.carta-area:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  background: #eff6ff;
+}
+
+.carta-area.active {
+  border-color: #10b981;
+  background: #d1fae5;
+  color: #065f46;
+}
+
+/* ========== LETTORE QR ========== */
+.lettore-qr {
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 15px;
+  padding: 20px;
+}
+
+.lettore-qr h3 {
+  font-size: 1.3rem;
+  color: #374151;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.qr-input-group {
+  display: flex;
+  gap: 10px;
+}
+
+.input-qr {
+  flex: 1;
+  padding: 12px 15px;
+  font-size: 1.1rem;
+  border: 2px solid #d1d5db;
+  border-radius: 10px;
+  transition: border-color 0.3s;
+}
+
+.input-qr:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.btn-qr {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 25px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.btn-qr:hover {
+  transform: translateY(-2px);
+}
+
+.btn-qr:active {
+  transform: scale(0.98);
+}
+
+.btn-qr:disabled {
+  background: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ========== PORTA ========== */
+.porta-container {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  background: #e5e7eb;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.porta {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  transition: transform 1.5s ease-in-out;
+  transform: translateY(0);
+}
+
+.porta.aperta {
+  transform: translateY(-100%);
+}
+
+.porta-status {
+  text-align: center;
+  margin-top: 15px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.porta-status.aperta {
+  color: #10b981;
+}
+
+.porta-status.chiusa {
+  color: #ef4444;
+}
+
+/* ========== PULSANTE PASSAGGIO PERSONA ========== */
+.btn-passaggio {
+  margin-top: 15px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.btn-passaggio:hover:not(:disabled) {
+  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+.btn-passaggio:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-passaggio:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #d1d5db;
+  color: #9ca3af;
+}
+
+.btn-passaggio.clicked {
+  transform: scale(0.95);
+}
+
+/* ========== UTILITY CLASSES ========== */
+.hidden {
+  display: none;
+}
