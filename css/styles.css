@@ -1,0 +1,95 @@
+/**
+ * Stili Generali - Simulatore Chiosco Ingresso
+ * Stili base per layout e tipografia
+ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.chiosco-container {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: 40px;
+  max-width: 1200px;
+  width: 100%;
+  min-height: 800px;
+}
+
+.chiosco-header {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.chiosco-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #667eea;
+}
+
+.chiosco-header p {
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.chiosco-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 30px;
+  min-height: 600px;
+}
+
+.display-area {
+  grid-column: 1 / -1;
+}
+
+.input-area {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.porta-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive per schermi piccoli */
+@media (max-width: 1024px) {
+  .chiosco-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .porta-area {
+    grid-column: 1;
+  }
+}
+
+/* Utility classes */
+.hidden {
+  display: none !important;
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: not-allowed;
+}

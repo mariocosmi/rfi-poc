@@ -1,0 +1,152 @@
+/**
+ * Animazioni - Simulatore Chiosco Ingresso
+ * Animazioni per porta e feedback visivi
+ */
+
+/* ========== ANIMAZIONI PORTA ========== */
+@keyframes porta-apri {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes porta-chiudi {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* ========== FEEDBACK VISIVI ========== */
+@keyframes pulse-success {
+  0%, 100% {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    transform: scale(1);
+  }
+  50% {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes pulse-error {
+  0%, 100% {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    transform: scale(1);
+  }
+  50% {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    transform: scale(1);
+  }
+  50% {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    transform: scale(1.02);
+  }
+}
+
+.display.pulse-success {
+  animation: pulse-success 0.5s ease 3;
+}
+
+.display.pulse-error {
+  animation: pulse-error 0.5s ease 3;
+}
+
+.display.pulse-warning {
+  animation: pulse-warning 0.5s ease 3;
+}
+
+/* ========== ANIMAZIONI PULSANTI ========== */
+@keyframes button-click {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.btn-moneta.clicked,
+.btn-carta.clicked,
+.btn-qr.clicked {
+  animation: button-click 0.2s ease;
+}
+
+/* ========== ANIMAZIONI CARICAMENTO ========== */
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spinner 0.8s linear infinite;
+}
+
+/* ========== TRANSIZIONI SMOOTH ========== */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-out {
+  animation: fadeOut 0.3s ease-out;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ========== SHAKE PER ERRORI ========== */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+.shake {
+  animation: shake 0.5s ease;
+}
