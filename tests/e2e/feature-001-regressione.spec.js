@@ -56,7 +56,7 @@ test.describe('Feature 001: Regressione Base', () => {
 
   // ===== PAGAMENTO CARTA =====
 
-  test.skip('T029: Pagamento carta VISA → successo', async ({ page, context }) => {
+  test('T029: Pagamento carta VISA → successo', async ({ page, context }) => {
     // SKIP: pagamento carta è randomizzato 80% successo
     // Test non deterministico - può fallire 20% volte
 
@@ -82,7 +82,7 @@ test.describe('Feature 001: Regressione Base', () => {
     // Se successo → porta aperta
     // Se fallimento → torna a IDLE
     expect(status).toMatch(/Aperta|Chiusa/);
-    expect(displayMsg).toMatch(/Accesso consentito|Pagamento rifiutato|Benvenuto/);
+    expect(displayMsg).toMatch(/Accesso consentito|Pagamento rifiutato|Benvenuto|Pagamento accettato/);
   });
 
   // ===== QR CODE =====
@@ -149,20 +149,18 @@ test.describe('Feature 001: Regressione Base', () => {
     await page.click('#btn-verifica-carta');
 
     // Input codice visibile
-    await expect(page.locator('#carta-input')).toBeVisible();
+    await expect(page.locator('#input-carta')).toBeVisible();
 
     await page.fill('#input-carta', '42');
-    await page.click('#btn-verifica-carta-submit');
+    await page.click('#btn-verifica-carta');
 
     await expect(page.locator('#display-message')).toContainText('Accesso autorizzato');
     await expect(page.locator('#porta-status')).toContainText('Aperta');
   });
 
-  test.skip('Carta NON autorizzata (77) → accesso negato', async ({ page }) => {
-    // SKIP: Carta autorizzata buggy - richiede fix separato
+  test('Carta NON autorizzata (777) → accesso negato', async ({ page }) => {
+    await page.fill('#input-carta', '777');
     await page.click('#btn-verifica-carta');
-    await page.fill('#input-carta', '77');
-    await page.click('#btn-verifica-carta-submit');
 
     await expect(page.locator('#display-message')).toContainText('Accesso negato');
     await expect(page.locator('#porta-status')).toContainText('Chiusa');
@@ -243,20 +241,6 @@ test.describe('Feature 001: Regressione Base', () => {
     await expect(page.locator('#display-message')).toContainText('Benvenuto', {
       timeout: 18000
     });
-  });
-
-  test.skip('PAGAMENTO_MONETE → PAGAMENTO_CARTA (cambio metodo)', async ({ page }) => {
-    // SKIP: Test carta instabile
-    // Inizia con monete
-    await page.click('button[data-valore="0.50"]');
-    await expect(page.locator('#display-amount')).toBeVisible();
-
-    // Cambio idea → passa a carta
-    await page.click('#btn-paga-carta');
-
-    // Monete azzerate, stato PAGAMENTO_CARTA
-    await expect(page.locator('#display-amount')).toBeHidden();
-    await expect(page.locator('#display-message')).toContainText('Avvicina la carta');
   });
 
   // ===== ANIMAZIONI E UI =====

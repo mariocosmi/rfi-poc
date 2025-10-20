@@ -11,7 +11,7 @@ class Suoneria {
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
     this.oscillator = null;
     this.gainNode = null;
-    this.attiva = false;
+    this._isAttiva = false;
 
     // Resume AudioContext dopo primo user interaction (autoplay policy)
     this._setupAutoplayFix();
@@ -49,7 +49,7 @@ class Suoneria {
       return;
     }
 
-    if (this.attiva) {
+    if (this._isAttiva) {
       log.debug('Suoneria: già attiva, skip attivazione');
       return;
     }
@@ -71,7 +71,7 @@ class Suoneria {
       // Avvia oscillatore (loop continuo)
       this.oscillator.start();
 
-      this.attiva = true;
+      this._isAttiva = true;
       log.info('Suoneria: attivata (800Hz, volume 30%)');
     } catch (error) {
       log.error('Suoneria: errore attivazione:', error);
@@ -84,7 +84,7 @@ class Suoneria {
    * - Idempotente: se già disattiva, return
    */
   disattiva() {
-    if (!this.attiva) {
+    if (!this._isAttiva) {
       log.debug('Suoneria: già disattiva, skip disattivazione');
       return;
     }
@@ -101,7 +101,7 @@ class Suoneria {
         this.gainNode = null;
       }
 
-      this.attiva = false;
+      this._isAttiva = false;
       log.info('Suoneria: disattivata');
     } catch (error) {
       log.error('Suoneria: errore disattivazione:', error);
@@ -113,7 +113,7 @@ class Suoneria {
    * @returns {boolean}
    */
   isAttiva() {
-    return this.attiva;
+    return this._isAttiva;
   }
 }
 

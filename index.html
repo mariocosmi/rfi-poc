@@ -36,6 +36,9 @@
                 <!-- Pannello Admin Manutenzione (T024) -->
                 <div class="pannello-admin" id="pannello-admin">
                     <h3>🔧 Manutenzione</h3>
+                    <div class="saldo-cassetta" id="saldo-cassetta">
+                        💰 Saldo cassetta: <span id="saldo-cassetta-valore">0,00€</span>
+                    </div>
                     <button class="btn-admin" id="btn-apri-cassetta">Apri Cassetta</button>
                     <button class="btn-admin" id="btn-chiudi-cassetta">Chiudi Cassetta</button>
                     <div class="countdown-timer hidden" id="countdown-timer"></div>
@@ -60,9 +63,18 @@
                     </div>
                 </div>
 
-                <!-- Lettore Carte -->
+                <!-- Pagamento Carta di Credito -->
+                <div class="pagamento-carta-credito">
+                    <h3>💳 Pagamento Carta di Credito</h3>
+                    <button class="btn-paga-carta" id="btn-paga-carta">Paga con Carta (1,20€)</button>
+                    <div class="carta-area hidden" id="carta-area">
+                        <p>Avvicina la carta al lettore...</p>
+                    </div>
+                </div>
+
+                <!-- Lettore Carte Autorizzate -->
                 <div class="lettore-carte">
-                    <h3>💳 Lettore Carte</h3>
+                    <h3>🔐 Lettore Carte Autorizzate</h3>
                     <div class="qr-input-group">
                         <input type="text" class="input-qr" id="input-carta" placeholder="Codice carta (es. 42)">
                         <button class="btn-qr" id="btn-verifica-carta">Verifica Carta</button>

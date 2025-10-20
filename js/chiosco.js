@@ -5,7 +5,8 @@
  * Stati:
  * - IDLE: Stato iniziale, in attesa di azione utente
  * - PAGAMENTO_MONETE: Inserimento monete in corso
- * - VERIFICA_QR: Verifica codice QR in corso
+ * - PAGAMENTO_CARTA: Pagamento con carta di credito VISA in corso
+ * - VERIFICA_QR: Verifica codice QR autorizzato in corso
  * - PORTA_APERTA: Porta aperta dopo pagamento/autorizzazione
  * - TIMEOUT: Timeout inattività durante operazione
  * - MANUTENZIONE_AUTH_PENDING: Attesa autenticazione operatore (10s countdown)
@@ -20,8 +21,9 @@ class Chiosco {
 
     // Transizioni permesse
     this.transizioniPermesse = {
-      'IDLE': ['PAGAMENTO_MONETE', 'VERIFICA_QR', 'MANUTENZIONE_AUTH_PENDING'],
+      'IDLE': ['PAGAMENTO_MONETE', 'PAGAMENTO_CARTA', 'VERIFICA_QR', 'PORTA_APERTA', 'MANUTENZIONE_AUTH_PENDING'],
       'PAGAMENTO_MONETE': ['PORTA_APERTA', 'TIMEOUT', 'IDLE', 'MANUTENZIONE_AUTH_PENDING'],
+      'PAGAMENTO_CARTA': ['PORTA_APERTA', 'IDLE'],
       'VERIFICA_QR': ['PORTA_APERTA', 'IDLE'],
       'PORTA_APERTA': ['IDLE', 'MANUTENZIONE_AUTH_PENDING'],
       'TIMEOUT': ['IDLE'],
@@ -91,6 +93,10 @@ class Chiosco {
 
       case 'PAGAMENTO_MONETE':
         this.onEntraPagamentoMonete();
+        break;
+
+      case 'PAGAMENTO_CARTA':
+        this.onEntraPagamentoCarta();
         break;
 
       case 'VERIFICA_QR':
@@ -166,6 +172,26 @@ class Chiosco {
     }
 
     log.info('💰 Pagamento monete iniziato');
+  }
+
+  /**
+   * Entra in stato PAGAMENTO_CARTA
+   */
+  onEntraPagamentoCarta() {
+    // Disabilita altri input
+    this.abilitaInput(false);
+
+    // Mostra area avvicinamento carta
+    if (this.lettoreCarte) {
+      this.lettoreCarte.mostraAreaPagamento();
+    }
+
+    // Mostra messaggio su display
+    if (this.display) {
+      this.display.mostraMessaggio('Avvicina la carta al lettore', 'info');
+    }
+
+    log.info('💳 Pagamento carta iniziato');
   }
 
   /**
@@ -279,7 +305,13 @@ class Chiosco {
       });
     }
 
-    // Pulsante carta + input (singolo, come QR)
+    // Pulsante pagamento carta (VISA)
+    if (!eccezioni.includes('pagamento-carta')) {
+      const btnPagaCarta = document.getElementById('btn-paga-carta');
+      if (btnPagaCarta) btnPagaCarta.disabled = !abilitato;
+    }
+
+    // Pulsante carta autorizzata + input (singolo, come QR)
     if (!eccezioni.includes('carta')) {
       const btnVerificaCarta = document.getElementById('btn-verifica-carta');
       const inputCarta = document.getElementById('input-carta');
@@ -419,29 +451,37 @@ class Chiosco {
       const saldoPrecedente = this.gettoniera ? this.gettoniera.azzeraSaldo() : 0;
 
       if (this.operazioneCorrente) {
-        this.operazioneCorrente.logEvento('AZZERAMENTO', { saldo: saldoPrecedente });
+        this.operazioneCorrente.logEvento('AZZERAMENTO', {
+          azzerato: true,
+          saldoPrima: saldoPrecedente,
+          saldoDopo: 0
+        });
       }
 
       if (this.display) {
         this.display.nascondiPulsantiAzzeramento();
-        this.display.mostraMessaggio(`Saldo azzerato: ${saldoPrecedente.toFixed(2)}€`, 'successo');
+        this.display.mostraMessaggio(`Saldo azzerato: ${Gettoniera.formattaImporto(saldoPrecedente)}`, 'successo');
       }
 
-      log.info(`✅ Saldo azzerato: ${saldoPrecedente.toFixed(2)}€`);
+      log.info(`✅ Saldo azzerato: ${Gettoniera.formattaImporto(saldoPrecedente)}`);
     } else {
       // Mantieni saldo
       const saldoCorrente = this.gettoniera ? this.gettoniera.getSaldoMonete() : 0;
 
       if (this.operazioneCorrente) {
-        this.operazioneCorrente.logEvento('NO_AZZERAMENTO', { saldo: saldoCorrente });
+        this.operazioneCorrente.logEvento('AZZERAMENTO', {
+          azzerato: false,
+          saldoPrima: saldoCorrente,
+          saldoDopo: saldoCorrente
+        });
       }
 
       if (this.display) {
         this.display.nascondiPulsantiAzzeramento();
-        this.display.mostraMessaggio(`Saldo mantenuto: ${saldoCorrente.toFixed(2)}€`, 'info');
+        this.display.mostraMessaggio(`Saldo mantenuto: ${Gettoniera.formattaImporto(saldoCorrente)}`, 'info');
       }
 
-      log.info(`ℹ️ Saldo mantenuto: ${saldoCorrente.toFixed(2)}€`);
+      log.info(`ℹ️ Saldo mantenuto: ${Gettoniera.formattaImporto(saldoCorrente)}`);
     }
 
     // Chiudi operazione manutenzione
@@ -482,6 +522,13 @@ class Chiosco {
   onEntraManutenzioneAttesaChiusura() {
     this.gestoreManutenzione.fermaCountdown();
 
+    // Abilita SOLO pulsante "Chiudi Cassetta"
+    const btnChiudiCassetta = document.getElementById('btn-chiudi-cassetta');
+    if (btnChiudiCassetta) {
+      btnChiudiCassetta.disabled = false;
+      log.debug('🔧 Pulsante "Chiudi Cassetta" abilitato');
+    }
+
     const codice = this.operazioneCorrente?.codiceOperatore || 'N/A';
     if (this.display) {
       this.display.mostraMessaggio(`Operatore autorizzato (${codice}) - Attesa chiusura cassetta`, 'success');
@@ -500,7 +547,7 @@ class Chiosco {
       this.display.mostraPulsantiAzzeramento(saldo);
     }
 
-    log.info(`💰 Scelta azzeramento - Saldo corrente: ${saldo.toFixed(2)}€`);
+    log.info(`💰 Scelta azzeramento - Saldo corrente: ${Gettoniera.formattaImporto(saldo)}`);
   }
 
   /**

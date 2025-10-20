@@ -45,6 +45,9 @@
       // Mostra messaggio iniziale
       display.mostraMessaggioIniziale();
 
+      // Inizializza display saldo cassetta
+      gettoniera.aggiornaSaldoCassetta();
+
       log.info('✅ Componenti creati e collegati');
 
       // ===== EVENT HANDLERS =====
@@ -86,6 +89,25 @@
           }
         });
       });
+
+      // Event handler "Paga con Carta" (pagamento VISA)
+      const btnPagaCarta = document.getElementById('btn-paga-carta');
+      if (btnPagaCarta) {
+        btnPagaCarta.addEventListener('click', function() {
+          log.debug('🖱️ Click "Paga con Carta"');
+
+          // Aggiungi animazione click
+          this.classList.add('clicked');
+          setTimeout(() => this.classList.remove('clicked'), 200);
+
+          // Transizione a PAGAMENTO_CARTA
+          if (chiosco.stato === 'IDLE') {
+            chiosco.transizione('PAGAMENTO_CARTA');
+          } else {
+            log.warn('⚠️ Pagamento carta richiesto ma stato non è IDLE');
+          }
+        });
+      }
 
       // Event handler "Verifica Carta" (logica contestuale come QR)
       const btnVerificaCarta = document.getElementById('btn-verifica-carta');

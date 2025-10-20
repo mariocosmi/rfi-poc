@@ -9,10 +9,13 @@ class Gettoniera {
     this.importoInserito = 0;
     this.moneteInserite = [];
 
+    // FEATURE 003: Saldo totale cassetta (non si azzera al reset)
+    this.saldoCassetta = 0;
+
     // Tagli monete disponibili (in euro)
     this.tagliDisponibili = [1.00, 0.50, 0.20, 0.10, 0.05, 0.02, 0.01];
 
-    log.info(`💰 Gettoniera inizializzata - Importo richiesto: ${this.importoRichiesto.toFixed(2)}€`);
+    log.info(`💰 Gettoniera inizializzata - Importo richiesto: ${Gettoniera.formattaImporto(this.importoRichiesto)}`);
   }
 
   /**
@@ -23,17 +26,21 @@ class Gettoniera {
   inserisciMoneta(valore) {
     // Verifica che sia un taglio valido
     if (!this.tagliDisponibili.includes(valore)) {
-      log.warn(`⚠️ Taglio moneta non valido: ${valore}€`);
+      log.warn(`⚠️ Taglio moneta non valido: ${Gettoniera.formattaImporto(valore)}`);
       return false;
     }
 
-    // Inserisci moneta
+    // Inserisci moneta (pagamento corrente + cassetta)
     this.importoInserito += valore;
     this.moneteInserite.push(valore);
+    this.saldoCassetta += valore;
 
     const rimanente = this.getImportoRimanente();
 
-    log.info(`💰 Moneta inserita: ${valore.toFixed(2)}€ | Totale: ${this.importoInserito.toFixed(2)}€ | Rimanente: ${rimanente.toFixed(2)}€`);
+    log.info(`💰 Moneta inserita: ${Gettoniera.formattaImporto(valore)} | Totale: ${Gettoniera.formattaImporto(this.importoInserito)} | Rimanente: ${Gettoniera.formattaImporto(rimanente)} | Saldo cassetta: ${Gettoniera.formattaImporto(this.saldoCassetta)}`);
+
+    // Aggiorna display saldo cassetta
+    this.aggiornaSaldoCassetta();
 
     return true;
   }
@@ -74,15 +81,17 @@ class Gettoniera {
 
   /**
    * Reset gettoniera (nuovo pagamento)
+   * NOTA: Azzera solo importo corrente, NON il saldo cassetta
    */
   reset() {
     const vecchioImporto = this.importoInserito;
 
     this.importoInserito = 0;
     this.moneteInserite = [];
+    // NON azzerare this.saldoCassetta - rimane in cassetta!
 
     if (vecchioImporto > 0) {
-      log.debug(`💰 Gettoniera resettata (importo precedente: ${vecchioImporto.toFixed(2)}€)`);
+      log.debug(`💰 Gettoniera resettata (importo precedente: ${Gettoniera.formattaImporto(vecchioImporto)}) - Saldo cassetta: ${Gettoniera.formattaImporto(this.saldoCassetta)}`);
     }
   }
 
@@ -92,21 +101,21 @@ class Gettoniera {
    * @returns {string} Importo formattato (es. "1,20 €")
    */
   static formattaImporto(importo) {
-    return importo.toFixed(2).replace('.', ',') + ' €';
+    return importo.toFixed(2).replace('.', ',') + '€';
   }
 
   /**
-   * Ottieni saldo monete corrente (T022)
+   * FEATURE 003 (T022): Ottieni saldo monete corrente nella cassetta
    * @returns {number} Saldo totale monete in cassetta (euro)
    */
   getSaldoMonete() {
-    const saldo = this.importoInserito;
-    log.debug(`💰 Saldo monete richiesto: ${saldo.toFixed(2)}€`);
+    const saldo = this.saldoCassetta;
+    log.debug(`💰 Saldo monete cassetta: ${Gettoniera.formattaImporto(saldo)}`);
     return Math.round(saldo * 100) / 100;
   }
 
   /**
-   * Azzera saldo monete (T023)
+   * FEATURE 003 (T023): Azzera saldo cassetta monete
    * Simula svuotamento fisico della cassetta
    * @returns {number} Saldo azzerato (per logging operazione)
    */
@@ -114,15 +123,31 @@ class Gettoniera {
     const saldoPrecedente = this.getSaldoMonete();
 
     if (saldoPrecedente <= 0) {
-      log.info('💰 Azzeramento saldo: già a 0€');
+      log.info(`💰 Azzeramento saldo cassetta: già a ${Gettoniera.formattaImporto(0)}`);
       return 0;
     }
 
-    this.importoInserito = 0;
-    this.moneteInserite = [];
+    // Azzera SOLO saldo cassetta, non importo corrente
+    this.saldoCassetta = 0;
 
-    log.warn(`💰 Saldo azzerato: ${saldoPrecedente.toFixed(2)}€ → 0,00€`);
+    // Aggiorna display saldo cassetta
+    this.aggiornaSaldoCassetta();
+
+    log.warn(`💰 Saldo cassetta azzerato: ${Gettoniera.formattaImporto(saldoPrecedente)} → ${Gettoniera.formattaImporto(0)}`);
     return saldoPrecedente;
+  }
+
+  /**
+   * Aggiorna display saldo cassetta nel pannello admin
+   */
+  aggiornaSaldoCassetta() {
+    const elementoSaldo = document.getElementById('saldo-cassetta-valore');
+    if (elementoSaldo) {
+      const saldo = this.getSaldoMonete();
+      const saldoFormattato = Gettoniera.formattaImporto(saldo);
+      elementoSaldo.textContent = `${saldoFormattato}`;
+      log.debug(`💰 Display saldo cassetta aggiornato: ${saldoFormattato}`);
+    }
   }
 }
 

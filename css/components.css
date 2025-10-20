@@ -45,6 +45,55 @@
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 }
 
+/* ========== PAGAMENTO CARTA DI CREDITO ========== */
+.pagamento-carta-credito {
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 15px;
+  padding: 20px;
+}
+
+.pagamento-carta-credito h3 {
+  font-size: 1.3rem;
+  color: #374151;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.btn-paga-carta {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 15px 20px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.btn-paga-carta:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-paga-carta:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-paga-carta:disabled {
+  background: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-paga-carta.clicked {
+  transform: scale(0.95);
+}
+
 /* ========== GETTONIERA ========== */
 .gettoniera {
   background: #f9fafb;
@@ -333,6 +382,25 @@
   color: #78350f;
   margin-bottom: 15px;
   text-align: center;
+}
+
+/* Saldo cassetta sempre visibile */
+.saldo-cassetta {
+  background: #fff;
+  border: 2px solid #d97706;
+  border-radius: 10px;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #78350f;
+}
+
+.saldo-cassetta #saldo-cassetta-valore {
+  color: #059669;
+  font-size: 1.3rem;
+  font-weight: 700;
 }
 
 .btn-admin {

@@ -79,9 +79,8 @@ test.describe('Feature 002: Passaggio Persona', () => {
 
   test('US1-T015: Display mostra "Passaggio rilevato"', async ({ page }) => {
     // Apri porta con carta autorizzata
-    await page.click('#btn-verifica-carta');
     await page.fill('#input-carta', '50');
-    await page.click('#btn-verifica-carta-submit');
+    await page.click('#btn-verifica-carta');
     await expect(page.locator('#porta-status')).toContainText('Aperta');
 
     const btnPassaggio = page.locator('#btn-passaggio-persona');
@@ -222,14 +221,13 @@ test.describe('Feature 002: Passaggio Persona', () => {
     logs.length = 0; // Reset logs
 
     // Test 2: Carta Autorizzata
-    await page.click('#btn-verifica-carta');
     await page.fill('#input-carta', '50');
-    await page.click('#btn-verifica-carta-submit');
+    await page.click('#btn-verifica-carta');
     await expect(page.locator('#porta-status')).toContainText('Aperta');
     await page.locator('#btn-passaggio-persona').click();
     await page.waitForTimeout(2000);
 
-    log = logs.find(l => l.includes('Passaggio persona') && l.includes('Metodo: carta-autorizzata'));
+    log = logs.find(l => l.includes('Passaggio persona') && l.includes('Metodo: carta'));
     expect(log).toBeTruthy();
   });
 

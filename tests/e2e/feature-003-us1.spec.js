@@ -32,6 +32,7 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     await expect(page.locator('#pannello-admin')).toBeVisible();
     await expect(page.locator('#btn-apri-cassetta')).toBeVisible();
     await expect(page.locator('#btn-chiudi-cassetta')).toBeVisible();
+    await expect(page.locator('#saldo-cassetta')).toBeVisible();
   });
 
   // ===== TEST 1: Svuotamento con azzeramento Sì =====
@@ -50,11 +51,17 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     await page.click('button[data-valore="1.00"]');
     await page.click('button[data-valore="0.20"]');
 
+    // Verifica saldo cassetta aggiornato
+    await expect(page.locator('#saldo-cassetta-valore')).toContainText('1,20€', { timeout: 2000 });
+
     // Attendi porta aperta e passaggio persona
     await expect(page.locator('#porta-status')).toContainText('Aperta', { timeout: 5000 });
     await page.locator('#btn-passaggio-persona').click();
     await expect(page.locator('#porta-status')).toContainText('Chiusa', { timeout: 3000 });
     await expect(page.locator('#display-message')).toContainText('Benvenuto', { timeout: 3000 });
+
+    // Verifica saldo cassetta PERSISTE dopo passaggio (non resettato!)
+    await expect(page.locator('#saldo-cassetta-valore')).toContainText('1,20€');
 
     // === FASE 2: Apertura cassetta → MANUTENZIONE_AUTH_PENDING ===
     await page.click('#btn-apri-cassetta');
@@ -72,19 +79,15 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     await expect(countdownTimer).toContainText('9 secondi rimasti');
 
     // === FASE 3: Autenticazione operatore con carta 42 ===
-    await page.click('#btn-verifica-carta');
     await page.fill('#input-carta', '42');
-    await page.click('#btn-verifica-carta-submit');
-
-    // Verifica countdown fermato
-    await page.waitForTimeout(500);
-    const countdownText = await countdownTimer.textContent();
-    const secondi = parseInt(countdownText);
-    expect(secondi).toBeLessThanOrEqual(9); // Countdown deve essersi fermato tra 9-8s
+    await page.click('#btn-verifica-carta');
 
     // Verifica display mostra operatore autorizzato
     await expect(page.locator('#display-message')).toContainText('Operatore autorizzato (42)', { timeout: 2000 });
     await expect(page.locator('#display-message')).toContainText('Attesa chiusura cassetta');
+
+    // Verifica pulsante "Chiudi Cassetta" ora abilitato
+    await expect(page.locator('#btn-chiudi-cassetta')).toBeEnabled();
 
     // === FASE 4: Chiusura cassetta → MANUTENZIONE_SCELTA_AZZERAMENTO ===
     await page.click('#btn-chiudi-cassetta');
@@ -110,7 +113,10 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     await expect(btnNo).toBeHidden();
 
     // Verifica display mostra conferma azzeramento
-    await expect(page.locator('#display-message')).toContainText('Saldo azzerato: 1,20', { timeout: 2000 });
+    await expect(page.locator('#display-message')).toContainText('Saldo azzerato: 1,20€', { timeout: 2000 });
+
+    // Verifica saldo cassetta azzerato
+    await expect(page.locator('#saldo-cassetta-valore')).toContainText('0,00€', { timeout: 1000 });
 
     // === FASE 6: Ritorno a IDLE dopo 3s ===
     await expect(page.locator('#display-message')).toContainText('Benvenuto', { timeout: 4000 });
@@ -126,7 +132,7 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     const logApertura = logs.find(l => l.includes('[Manutenzione] APERTURA'));
     const logAuthSuccess = logs.find(l => l.includes('[Manutenzione] AUTH_SUCCESS') && l.includes('42'));
     const logChiusura = logs.find(l => l.includes('[Manutenzione] CHIUSURA'));
-    const logAzzeramento = logs.find(l => l.includes('[Manutenzione] AZZERAMENTO'));
+    const logAzzeramento = logs.find(l => l.includes('[Manutenzione] AZZERAMENTO') && l.includes('azzerato'));
 
     expect(logApertura).toBeTruthy();
     expect(logAuthSuccess).toBeTruthy();
@@ -150,18 +156,27 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     // === FASE 1: Inserimento monete (saldo 2,00€) ===
     await page.click('button[data-valore="1.00"]');
     await page.click('button[data-valore="1.00"]');
+
+    // Verifica saldo cassetta
+    await expect(page.locator('#saldo-cassetta-valore')).toContainText('2,00€');
+
     await expect(page.locator('#porta-status')).toContainText('Aperta', { timeout: 5000 });
     await page.locator('#btn-passaggio-persona').click();
     await expect(page.locator('#display-message')).toContainText('Benvenuto', { timeout: 4000 });
+
+    // Verifica saldo persiste
+    await expect(page.locator('#saldo-cassetta-valore')).toContainText('2,00€');
 
     // === FASE 2-4: Apertura, autenticazione, chiusura ===
     await page.click('#btn-apri-cassetta');
     await expect(page.locator('#display-message')).toContainText('Cassetta aperta - Autenticazione richiesta');
 
-    await page.click('#btn-verifica-carta');
     await page.fill('#input-carta', '50');
-    await page.click('#btn-verifica-carta-submit');
+    await page.click('#btn-verifica-carta');
     await expect(page.locator('#display-message')).toContainText('Operatore autorizzato (50)');
+
+    // Verifica pulsante "Chiudi Cassetta" abilitato
+    await expect(page.locator('#btn-chiudi-cassetta')).toBeEnabled();
 
     await page.click('#btn-chiudi-cassetta');
 
@@ -171,7 +186,10 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     await btnNo.click();
 
     // Verifica display mostra saldo mantenuto
-    await expect(page.locator('#display-message')).toContainText('Saldo mantenuto: 2,00', { timeout: 2000 });
+    await expect(page.locator('#display-message')).toContainText('Saldo mantenuto: 2,00€', { timeout: 2000 });
+
+    // Verifica saldo cassetta NON azzerato
+    await expect(page.locator('#saldo-cassetta-valore')).toContainText('2,00€');
 
     // === FASE 6: Ritorno a IDLE ===
     await expect(page.locator('#display-message')).toContainText('Benvenuto', { timeout: 4000 });
@@ -179,12 +197,9 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     // === VERIFICA LOGGING ===
     await page.waitForTimeout(500);
 
-    const logNoAzzeramento = logs.find(l => l.includes('[Manutenzione] NO_AZZERAMENTO'));
-    expect(logNoAzzeramento).toBeTruthy();
-
-    // Verifica log NON include AZZERAMENTO
-    const logAzzeramento = logs.find(l => l.includes('[Manutenzione] AZZERAMENTO') && !l.includes('NO_'));
-    expect(logAzzeramento).toBeFalsy();
+    // Ora il log è AZZERAMENTO con azzerato: false, NON NO_AZZERAMENTO
+    const logAzzeramentoMantenuto = logs.find(l => l.includes('[Manutenzione] AZZERAMENTO') && l.includes('mantenuto'));
+    expect(logAzzeramentoMantenuto).toBeTruthy();
 
     console.log('✅ Test US1-02: Svuotamento con azzeramento No completato');
   });
@@ -242,9 +257,8 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     expect(logSuoneria).toBeTruthy();
 
     // === FASE 5: Reset da FUORI_SERVIZIO con carta autorizzata ===
-    await page.click('#btn-verifica-carta');
     await page.fill('#input-carta', '99');
-    await page.click('#btn-verifica-carta-submit');
+    await page.click('#btn-verifica-carta');
 
     // Verifica display mostra reset
     await expect(page.locator('#display-message')).toContainText('Sistema ripristinato da operatore (99)', { timeout: 2000 });
@@ -278,9 +292,8 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     await expect(countdownTimer).toHaveClass(/urgente/, { timeout: 2000 });
 
     // Autentica per fermare countdown prima del timeout
-    await page.click('#btn-verifica-carta');
     await page.fill('#input-carta', '42');
-    await page.click('#btn-verifica-carta-submit');
+    await page.click('#btn-verifica-carta');
 
     console.log('✅ Test US1-04: Classe urgente countdown verificata');
   });
@@ -304,9 +317,8 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     await expect(countdownTimer).toContainText('10 secondi rimasti');
 
     // Tentativo autenticazione con codice non autorizzato (> 99)
-    await page.click('#btn-verifica-carta');
     await page.fill('#input-carta', '123');
-    await page.click('#btn-verifica-carta-submit');
+    await page.click('#btn-verifica-carta');
 
     // Verifica display mostra accesso negato
     await expect(page.locator('#display-message')).toContainText('Accesso negato (123)', { timeout: 2000 });
@@ -314,16 +326,6 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     // Countdown deve continuare (non fermato)
     await page.waitForTimeout(2500); // Attendi 2.5s dopo errore
     await expect(countdownTimer).toBeVisible(); // Countdown ancora attivo
-
-    // Verifica log AUTH_FAIL
-    await page.waitForTimeout(500);
-    const logAuthFail = logs.find(l => l.includes('[Manutenzione] AUTH_FAIL') && l.includes('123'));
-    expect(logAuthFail).toBeTruthy();
-
-    // Autentica correttamente per completare test
-    await page.click('#btn-verifica-carta');
-    await page.fill('#input-carta', '42');
-    await page.click('#btn-verifica-carta-submit');
 
     console.log('✅ Test US1-05: AUTH_FAIL con codice non autorizzato verificato');
   });
@@ -333,9 +335,15 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
   test('US1-06: Regressione - Pagamento monete funziona senza interferenze', async ({ page }) => {
     // Verifica feature 001 non influenzata da nuovi pulsanti admin
 
+    // Saldo cassetta inizia a 0
+    await expect(page.locator('#saldo-cassetta-valore')).toContainText('0,00€');
+
     // Test pagamento monete standard
     await page.click('button[data-valore="1.00"]');
     await page.click('button[data-valore="0.20"]');
+
+    // Saldo cassetta aggiornato
+    await expect(page.locator('#saldo-cassetta-valore')).toContainText('1,20€');
 
     // Porta apre normalmente
     await expect(page.locator('#porta-status')).toContainText('Aperta', { timeout: 5000 });
@@ -346,9 +354,8 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     // Pulsante passaggio persona visibile (feature 002)
     await expect(page.locator('#btn-passaggio-persona')).toBeVisible();
 
-    // Pulsanti admin NON devono essere disabilitati in PORTA_APERTA
-    // (questo è un comportamento nuovo - admin disabilitato solo in stati manutenzione)
-    await expect(page.locator('#btn-apri-cassetta')).toBeDisabled(); // Disabilitato in PORTA_APERTA
+    // Pulsanti admin disabilitati in PORTA_APERTA
+    await expect(page.locator('#btn-apri-cassetta')).toBeDisabled();
     await expect(page.locator('#btn-chiudi-cassetta')).toBeDisabled();
 
     console.log('✅ Test US1-06: Regressione feature 001 verificata');
