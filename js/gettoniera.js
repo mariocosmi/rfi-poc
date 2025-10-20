@@ -94,6 +94,36 @@ class Gettoniera {
   static formattaImporto(importo) {
     return importo.toFixed(2).replace('.', ',') + ' €';
   }
+
+  /**
+   * Ottieni saldo monete corrente (T022)
+   * @returns {number} Saldo totale monete in cassetta (euro)
+   */
+  getSaldoMonete() {
+    const saldo = this.importoInserito;
+    log.debug(`💰 Saldo monete richiesto: ${saldo.toFixed(2)}€`);
+    return Math.round(saldo * 100) / 100;
+  }
+
+  /**
+   * Azzera saldo monete (T023)
+   * Simula svuotamento fisico della cassetta
+   * @returns {number} Saldo azzerato (per logging operazione)
+   */
+  azzeraSaldo() {
+    const saldoPrecedente = this.getSaldoMonete();
+
+    if (saldoPrecedente <= 0) {
+      log.info('💰 Azzeramento saldo: già a 0€');
+      return 0;
+    }
+
+    this.importoInserito = 0;
+    this.moneteInserite = [];
+
+    log.warn(`💰 Saldo azzerato: ${saldoPrecedente.toFixed(2)}€ → 0,00€`);
+    return saldoPrecedente;
+  }
 }
 
 // Export globale

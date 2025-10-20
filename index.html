@@ -33,6 +33,19 @@
 
             <!-- Area Input (Sinistra) -->
             <div class="input-area">
+                <!-- Pannello Admin Manutenzione (T024) -->
+                <div class="pannello-admin" id="pannello-admin">
+                    <h3>🔧 Manutenzione</h3>
+                    <button class="btn-admin" id="btn-apri-cassetta">Apri Cassetta</button>
+                    <button class="btn-admin" id="btn-chiudi-cassetta">Chiudi Cassetta</button>
+                    <div class="countdown-timer hidden" id="countdown-timer"></div>
+                    <div class="pulsanti-azzeramento hidden" id="pulsanti-azzeramento">
+                        <p class="azzeramento-prompt">Azzerare saldo monete?</p>
+                        <button class="btn-azzera-si" id="btn-azzera-si" disabled>Sì</button>
+                        <button class="btn-azzera-no" id="btn-azzera-no" disabled>No</button>
+                    </div>
+                </div>
+
                 <!-- Gettoniera -->
                 <div class="gettoniera">
                     <h3>💰 Gettoniera</h3>
@@ -50,16 +63,9 @@
                 <!-- Lettore Carte -->
                 <div class="lettore-carte">
                     <h3>💳 Lettore Carte</h3>
-                    <div class="carta-buttons">
-                        <button class="btn-carta" id="btn-paga-carta">Paga con Carta</button>
-                        <button class="btn-carta verifica" id="btn-verifica-carta">Verifica Carta Autorizzata</button>
-                    </div>
-                    <div class="carta-area hidden" id="carta-area">
-                        <p>👆 Avvicina la carta qui</p>
-                    </div>
-                    <div class="carta-input hidden" id="carta-input">
+                    <div class="qr-input-group">
                         <input type="text" class="input-qr" id="input-carta" placeholder="Codice carta (es. 42)">
-                        <button class="btn-qr" id="btn-verifica-carta-submit">Verifica</button>
+                        <button class="btn-qr" id="btn-verifica-carta">Verifica Carta</button>
                     </div>
                 </div>
 
@@ -104,6 +110,9 @@
     <script src="js/lettore-carte.js"></script>
     <script src="js/lettore-qr.js"></script>
     <script src="js/chiosco.js"></script>
+    <script src="js/sensore-cassetta.js"></script>
+    <script src="js/suoneria.js"></script>
+    <script src="js/gestore-manutenzione.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

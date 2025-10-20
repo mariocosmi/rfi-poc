@@ -127,6 +127,89 @@ class Display {
   }
 
   /**
+   * Aggiorna countdown manutenzione (T019)
+   * @param {number} secondi - Secondi rimanenti per autenticazione
+   */
+  aggiornaCountdownManutenzione(secondi) {
+    const elementoTimer = document.getElementById('countdown-timer');
+    if (!elementoTimer) {
+      log.warn('Display: elemento #countdown-timer non trovato');
+      return;
+    }
+
+    if (secondi > 0) {
+      elementoTimer.textContent = `${secondi} secondi rimasti`;
+      elementoTimer.classList.remove('hidden');
+
+      // Aggiungi classe 'urgente' se <= 3 secondi (stile rosso)
+      if (secondi <= 3) {
+        elementoTimer.classList.add('urgente');
+      } else {
+        elementoTimer.classList.remove('urgente');
+      }
+
+      log.debug(`Display: countdown manutenzione aggiornato a ${secondi}s`);
+    } else {
+      elementoTimer.classList.add('hidden');
+      elementoTimer.classList.remove('urgente');
+    }
+  }
+
+  /**
+   * Mostra pulsanti azzeramento saldo (T020)
+   * @param {number} saldo - Saldo monete corrente in euro
+   */
+  mostraPulsantiAzzeramento(saldo) {
+    const container = document.getElementById('pulsanti-azzeramento');
+    const btnSi = document.getElementById('btn-azzera-si');
+    const btnNo = document.getElementById('btn-azzera-no');
+
+    if (!container || !btnSi || !btnNo) {
+      log.error('Display: elementi pulsanti azzeramento non trovati nel DOM');
+      return;
+    }
+
+    const saldoFormattato = saldo.toFixed(2).replace('.', ',');
+    this.mostraMessaggio(`Azzerare saldo monete (${saldoFormattato} €)?`, 'warning');
+
+    btnSi.disabled = false;
+    btnNo.disabled = false;
+    container.classList.remove('hidden');
+
+    log.info(`Display: pulsanti azzeramento mostrati (saldo: ${saldoFormattato} €)`);
+  }
+
+  /**
+   * Nascondi pulsanti azzeramento (T021)
+   */
+  nascondiPulsantiAzzeramento() {
+    const container = document.getElementById('pulsanti-azzeramento');
+    const btnSi = document.getElementById('btn-azzera-si');
+    const btnNo = document.getElementById('btn-azzera-no');
+
+    if (!container || !btnSi || !btnNo) return;
+
+    btnSi.disabled = true;
+    btnNo.disabled = true;
+    container.classList.add('hidden');
+
+    log.debug('Display: pulsanti azzeramento nascosti');
+  }
+
+  /**
+   * Mostra schermata fuori servizio (T020)
+   */
+  mostraFuoriServizio() {
+    this.mostraMessaggio('FUORI SERVIZIO - Attendere operatore', 'errore');
+    this.nascondiImporto();
+    this.nascondiCountdown();
+    this.rimuoviClassiStato();
+    this.elementoDisplay.classList.add('errore'); // Mantiene stato rosso
+
+    log.warn('Display: modalità FUORI SERVIZIO attivata');
+  }
+
+  /**
    * Mostra messaggio + importo
    * @param {string} messaggio - Messaggio
    * @param {number} importo - Importo rimanente

@@ -30,7 +30,7 @@ class LettoreCarte {
 
     this.modalita = 'PAGAMENTO';
     this.areaCartaPagamento.classList.remove('hidden');
-    this.inputCartaAutorizzazione.classList.add('hidden');
+    // inputCartaAutorizzazione rimane sempre visibile (come QR)
 
     // Event handler per simulazione avvicinamento carta
     const handler = (e) => {
@@ -45,14 +45,17 @@ class LettoreCarte {
   }
 
   /**
-   * Mostra input per codice carta autorizzata
+   * Abilita input per codice carta autorizzata
+   * Nota: campo sempre visibile, gestito da abilitaInput() come QR
    */
   mostraInputCodice() {
-    if (!this.inputCartaAutorizzazione) return;
+    // Campo input carta è sempre visibile (come QR)
+    // Solo nasconde area pagamento se attiva
+    if (this.areaCartaPagamento) {
+      this.areaCartaPagamento.classList.add('hidden');
+    }
 
     this.modalita = 'AUTORIZZAZIONE';
-    this.areaCartaPagamento.classList.add('hidden');
-    this.inputCartaAutorizzazione.classList.remove('hidden');
 
     // Event handler verifica codice
     const handler = () => {
@@ -151,8 +154,7 @@ class LettoreCarte {
         }, 2000);
       }
 
-      // Nascondi input
-      this.inputCartaAutorizzazione.classList.add('hidden');
+      // Input carta rimane sempre visibile (gestito da abilitaInput)
       this.modalita = null;
     }, 500);
   }
@@ -164,12 +166,9 @@ class LettoreCarte {
     this.modalita = null;
     this.statoTransazione = null;
 
+    // Nascondi solo area pagamento (input carta sempre visibile)
     if (this.areaCartaPagamento) {
       this.areaCartaPagamento.classList.add('hidden');
-    }
-
-    if (this.inputCartaAutorizzazione) {
-      this.inputCartaAutorizzazione.classList.add('hidden');
     }
 
     log.debug('💳 Lettore carte resettato');

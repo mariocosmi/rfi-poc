@@ -87,37 +87,40 @@
         });
       });
 
-      // Event handler "Paga con Carta"
-      const btnPagaCarta = document.getElementById('btn-paga-carta');
-      if (btnPagaCarta) {
-        btnPagaCarta.addEventListener('click', function() {
-          log.debug('🖱️ Click "Paga con Carta"');
+      // Event handler "Verifica Carta" (logica contestuale come QR)
+      const btnVerificaCarta = document.getElementById('btn-verifica-carta');
+      const inputCarta = document.getElementById('input-carta');
 
-          // Aggiungi animazione click
-          this.classList.add('clicked');
-          setTimeout(() => this.classList.remove('clicked'), 200);
+      if (btnVerificaCarta && inputCarta) {
+        const verificaCarta = () => {
+          const codice = inputCarta.value.trim();
 
-          // Se in PAGAMENTO_MONETE, azzera monete
-          if (chiosco.stato === 'PAGAMENTO_MONETE') {
-            gettoniera.reset();
-            gestoreTimeout.reset();
+          if (!codice) {
+            log.warn('⚠️ Codice carta vuoto');
+            display.mostraMessaggio('Inserisci un codice carta', 'warning');
+            return;
           }
 
-          chiosco.transizione('PAGAMENTO_CARTA');
-        });
-      }
-
-      // Event handler "Verifica Carta Autorizzata"
-      const btnVerificaCarta = document.getElementById('btn-verifica-carta');
-      if (btnVerificaCarta) {
-        btnVerificaCarta.addEventListener('click', function() {
-          log.debug('🖱️ Click "Verifica Carta Autorizzata"');
+          log.debug(`🖱️ Verifica carta: "${codice}"`);
 
           // Aggiungi animazione click
-          this.classList.add('clicked');
-          setTimeout(() => this.classList.remove('clicked'), 200);
+          btnVerificaCarta.classList.add('clicked');
+          setTimeout(() => btnVerificaCarta.classList.remove('clicked'), 200);
 
-          chiosco.transizione('VERIFICA_CARTA');
+          // Chiama verificaCarta che gestisce logica contestuale
+          chiosco.verificaCarta(codice);
+
+          // Pulisci input
+          inputCarta.value = '';
+        };
+
+        btnVerificaCarta.addEventListener('click', verificaCarta);
+
+        // Enter key su input carta
+        inputCarta.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            verificaCarta();
+          }
         });
       }
 
@@ -170,6 +173,66 @@
 
           // Chiama handler chiosco
           chiosco.onPassaggioPersona();
+        });
+      }
+
+      // FEATURE 003: Event handler "Apri Cassetta" (T030)
+      const btnApriCassetta = document.getElementById('btn-apri-cassetta');
+      if (btnApriCassetta) {
+        btnApriCassetta.addEventListener('click', function() {
+          log.debug('🖱️ Click "Apri Cassetta"');
+
+          // Aggiungi animazione click
+          this.classList.add('clicked');
+          setTimeout(() => this.classList.remove('clicked'), 200);
+
+          // Simula apertura fisica cassetta → trigger evento sensoreCassetta
+          chiosco.sensoreCassetta.apri();
+        });
+      }
+
+      // FEATURE 003: Event handler "Chiudi Cassetta" (T030)
+      const btnChiudiCassetta = document.getElementById('btn-chiudi-cassetta');
+      if (btnChiudiCassetta) {
+        btnChiudiCassetta.addEventListener('click', function() {
+          log.debug('🖱️ Click "Chiudi Cassetta"');
+
+          // Aggiungi animazione click
+          this.classList.add('clicked');
+          setTimeout(() => this.classList.remove('clicked'), 200);
+
+          // Simula chiusura fisica cassetta → trigger evento sensoreCassetta
+          chiosco.sensoreCassetta.chiudi();
+        });
+      }
+
+      // FEATURE 003: Event handler "Azzera Saldo - Sì" (T030)
+      const btnAzzeraSi = document.getElementById('btn-azzera-si');
+      if (btnAzzeraSi) {
+        btnAzzeraSi.addEventListener('click', function() {
+          log.debug('🖱️ Click "Azzera Saldo - Sì"');
+
+          // Aggiungi animazione click
+          this.classList.add('clicked');
+          setTimeout(() => this.classList.remove('clicked'), 200);
+
+          // Chiama handler chiosco per azzeramento
+          chiosco.confermaAzzeramento(true);
+        });
+      }
+
+      // FEATURE 003: Event handler "Azzera Saldo - No" (T030)
+      const btnAzzeraNo = document.getElementById('btn-azzera-no');
+      if (btnAzzeraNo) {
+        btnAzzeraNo.addEventListener('click', function() {
+          log.debug('🖱️ Click "Azzera Saldo - No"');
+
+          // Aggiungi animazione click
+          this.classList.add('clicked');
+          setTimeout(() => this.classList.remove('clicked'), 200);
+
+          // Chiama handler chiosco per rifiuto azzeramento
+          chiosco.confermaAzzeramento(false);
         });
       }
 

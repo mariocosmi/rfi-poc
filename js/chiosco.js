@@ -5,11 +5,13 @@
  * Stati:
  * - IDLE: Stato iniziale, in attesa di azione utente
  * - PAGAMENTO_MONETE: Inserimento monete in corso
- * - PAGAMENTO_CARTA: Pagamento con carta di credito in corso
  * - VERIFICA_QR: Verifica codice QR in corso
- * - VERIFICA_CARTA: Verifica carta contactless autorizzata in corso
  * - PORTA_APERTA: Porta aperta dopo pagamento/autorizzazione
  * - TIMEOUT: Timeout inattività durante operazione
+ * - MANUTENZIONE_AUTH_PENDING: Attesa autenticazione operatore (10s countdown)
+ * - MANUTENZIONE_ATTESA_CHIUSURA: Operatore autenticato, attesa chiusura cassetta
+ * - MANUTENZIONE_SCELTA_AZZERAMENTO: Scelta azzeramento saldo monete
+ * - FUORI_SERVIZIO: Sistema non disponibile (timeout auth), richiede reset operatore
  */
 
 class Chiosco {
@@ -18,13 +20,15 @@ class Chiosco {
 
     // Transizioni permesse
     this.transizioniPermesse = {
-      'IDLE': ['PAGAMENTO_MONETE', 'PAGAMENTO_CARTA', 'VERIFICA_QR', 'VERIFICA_CARTA'],
-      'PAGAMENTO_MONETE': ['PORTA_APERTA', 'TIMEOUT', 'IDLE', 'PAGAMENTO_CARTA'],
-      'PAGAMENTO_CARTA': ['PORTA_APERTA', 'IDLE'],
+      'IDLE': ['PAGAMENTO_MONETE', 'VERIFICA_QR', 'MANUTENZIONE_AUTH_PENDING'],
+      'PAGAMENTO_MONETE': ['PORTA_APERTA', 'TIMEOUT', 'IDLE', 'MANUTENZIONE_AUTH_PENDING'],
       'VERIFICA_QR': ['PORTA_APERTA', 'IDLE'],
-      'VERIFICA_CARTA': ['PORTA_APERTA', 'IDLE'],
-      'PORTA_APERTA': ['IDLE'],
-      'TIMEOUT': ['IDLE']
+      'PORTA_APERTA': ['IDLE', 'MANUTENZIONE_AUTH_PENDING'],
+      'TIMEOUT': ['IDLE'],
+      'MANUTENZIONE_AUTH_PENDING': ['MANUTENZIONE_ATTESA_CHIUSURA', 'FUORI_SERVIZIO', 'IDLE'],
+      'MANUTENZIONE_ATTESA_CHIUSURA': ['MANUTENZIONE_SCELTA_AZZERAMENTO', 'FUORI_SERVIZIO'],
+      'MANUTENZIONE_SCELTA_AZZERAMENTO': ['IDLE'],
+      'FUORI_SERVIZIO': ['IDLE']
     };
 
     // Riferimenti ai componenti (saranno impostati da app.js)
@@ -34,6 +38,17 @@ class Chiosco {
     this.lettoreCarte = null;
     this.lettoreQR = null;
     this.gestoreTimeout = null;
+
+    // Feature 003: Componenti manutenzione
+    this.sensoreCassetta = new SensoreCassetta();
+    this.suoneria = new Suoneria();
+    this.gestoreManutenzione = new GestoreManutenzione(this);
+    this.operazioneCorrente = null;
+    this.pendenteAperturaCassetta = false;
+
+    // Feature 003: Registra listener sensore cassetta
+    this.sensoreCassetta.on('cassettaAperta', () => this.onCassettaAperta());
+    this.sensoreCassetta.on('cassettaChiusa', () => this.onCassettaChiusa());
 
     log.info('🏗️ Chiosco inizializzato - Stato: IDLE');
   }
@@ -78,16 +93,8 @@ class Chiosco {
         this.onEntraPagamentoMonete();
         break;
 
-      case 'PAGAMENTO_CARTA':
-        this.onEntraPagamentoCarta();
-        break;
-
       case 'VERIFICA_QR':
         this.onEntraVerificaQR(dati.codice);
-        break;
-
-      case 'VERIFICA_CARTA':
-        this.onEntraVerificaCarta();
         break;
 
       case 'PORTA_APERTA':
@@ -96,6 +103,22 @@ class Chiosco {
 
       case 'TIMEOUT':
         this.onEntraTimeout();
+        break;
+
+      case 'MANUTENZIONE_AUTH_PENDING':
+        this.onEntraManutenzioneAuthPending();
+        break;
+
+      case 'MANUTENZIONE_ATTESA_CHIUSURA':
+        this.onEntraManutenzioneAttesaChiusura();
+        break;
+
+      case 'MANUTENZIONE_SCELTA_AZZERAMENTO':
+        this.onEntraManutenzioneSceltaAzzeramento();
+        break;
+
+      case 'FUORI_SERVIZIO':
+        this.onEntraFuoriServizio();
         break;
     }
   }
@@ -146,26 +169,6 @@ class Chiosco {
   }
 
   /**
-   * Entra in stato PAGAMENTO_CARTA
-   */
-  onEntraPagamentoCarta() {
-    // Disabilita altri input
-    this.abilitaInput(false, ['carta']);
-
-    // Mostra area avvicinamento carta
-    if (this.lettoreCarte) {
-      this.lettoreCarte.mostraAreaPagamento();
-    }
-
-    // Mostra messaggio su display
-    if (this.display) {
-      this.display.mostraMessaggio('Avvicina la carta al lettore', 'info');
-    }
-
-    log.info('💳 Pagamento carta iniziato');
-  }
-
-  /**
    * Entra in stato VERIFICA_QR
    * @param {string} codice - Codice QR scansionato
    */
@@ -192,26 +195,6 @@ class Chiosco {
         setTimeout(() => this.transizione('IDLE'), 2000);
       }
     }, 500);
-  }
-
-  /**
-   * Entra in stato VERIFICA_CARTA
-   */
-  onEntraVerificaCarta() {
-    // Disabilita altri input
-    this.abilitaInput(false, ['carta']);
-
-    // Mostra input codice
-    if (this.lettoreCarte) {
-      this.lettoreCarte.mostraInputCodice();
-    }
-
-    // Mostra messaggio su display
-    if (this.display) {
-      this.display.mostraMessaggio('Inserisci codice carta autorizzata', 'info');
-    }
-
-    log.info('🔐 Verifica carta autorizzata iniziata');
   }
 
   /**
@@ -296,12 +279,13 @@ class Chiosco {
       });
     }
 
-    // Pulsanti carte
+    // Pulsante carta + input (singolo, come QR)
     if (!eccezioni.includes('carta')) {
-      const btnPagaCarta = document.getElementById('btn-paga-carta');
       const btnVerificaCarta = document.getElementById('btn-verifica-carta');
-      if (btnPagaCarta) btnPagaCarta.disabled = !abilitato;
+      const inputCarta = document.getElementById('input-carta');
+
       if (btnVerificaCarta) btnVerificaCarta.disabled = !abilitato;
+      if (inputCarta) inputCarta.disabled = !abilitato;
     }
 
     // QR
@@ -310,6 +294,22 @@ class Chiosco {
       const inputQR = document.getElementById('input-qr');
       if (btnQR) btnQR.disabled = !abilitato;
       if (inputQR) inputQR.disabled = !abilitato;
+    }
+
+    // FEATURE 003 (T031): Pulsanti admin manutenzione
+    if (!eccezioni.includes('admin')) {
+      const btnApriCassetta = document.getElementById('btn-apri-cassetta');
+      const btnChiudiCassetta = document.getElementById('btn-chiudi-cassetta');
+      const btnAzzeraSi = document.getElementById('btn-azzera-si');
+      const btnAzzeraNo = document.getElementById('btn-azzera-no');
+
+      // Abilita/disabilita in base allo stato
+      // Apri/Chiudi cassetta: sempre abilitati in IDLE, disabilitati altrove
+      if (btnApriCassetta) btnApriCassetta.disabled = !abilitato;
+      if (btnChiudiCassetta) btnChiudiCassetta.disabled = !abilitato;
+
+      // Pulsanti azzeramento: gestiti da display, non modificare qui
+      // (vengono abilitati solo in MANUTENZIONE_SCELTA_AZZERAMENTO)
     }
 
     log.debug(`Input ${abilitato ? 'abilitati' : 'disabilitati'}${eccezioni.length ? ' (eccezioni: ' + eccezioni.join(', ') + ')' : ''}`);
@@ -368,10 +368,252 @@ class Chiosco {
   }
 
   /**
+   * FEATURE 003: Handler apertura cassetta
+   */
+  onCassettaAperta() {
+    const statiTransito = ['PORTA_APERTA', 'PAGAMENTO_MONETE'];
+
+    if (statiTransito.includes(this.stato)) {
+      log.info('Cassetta aperta durante transito - attesa fine operazione');
+      this.pendenteAperturaCassetta = true;
+
+      // Se pagamento monete, annulla
+      if (this.stato === 'PAGAMENTO_MONETE') {
+        log.warn('Pagamento monete annullato per manutenzione');
+        if (this.gettoniera) {
+          this.gettoniera.reset();
+        }
+        this.transizione('MANUTENZIONE_AUTH_PENDING');
+      }
+    } else if (this.stato === 'IDLE') {
+      this.transizione('MANUTENZIONE_AUTH_PENDING');
+    } else {
+      log.warn('Apertura cassetta ignorata, stato incompatibile: ' + this.stato);
+    }
+  }
+
+  /**
+   * FEATURE 003: Handler chiusura cassetta
+   */
+  onCassettaChiusa() {
+    if (this.stato === 'MANUTENZIONE_ATTESA_CHIUSURA') {
+      if (this.operazioneCorrente) {
+        this.operazioneCorrente.logEvento('CHIUSURA');
+      }
+      this.transizione('MANUTENZIONE_SCELTA_AZZERAMENTO');
+    }
+  }
+
+  /**
+   * FEATURE 003: Handler conferma azzeramento (T032)
+   * @param {boolean} scelta - true per azzerare, false per mantenere
+   */
+  confermaAzzeramento(scelta) {
+    if (this.stato !== 'MANUTENZIONE_SCELTA_AZZERAMENTO') {
+      log.warn('⚠️ Tentativo conferma azzeramento fuori contesto - Ignorato');
+      return;
+    }
+
+    if (scelta) {
+      // Azzera saldo
+      const saldoPrecedente = this.gettoniera ? this.gettoniera.azzeraSaldo() : 0;
+
+      if (this.operazioneCorrente) {
+        this.operazioneCorrente.logEvento('AZZERAMENTO', { saldo: saldoPrecedente });
+      }
+
+      if (this.display) {
+        this.display.nascondiPulsantiAzzeramento();
+        this.display.mostraMessaggio(`Saldo azzerato: ${saldoPrecedente.toFixed(2)}€`, 'successo');
+      }
+
+      log.info(`✅ Saldo azzerato: ${saldoPrecedente.toFixed(2)}€`);
+    } else {
+      // Mantieni saldo
+      const saldoCorrente = this.gettoniera ? this.gettoniera.getSaldoMonete() : 0;
+
+      if (this.operazioneCorrente) {
+        this.operazioneCorrente.logEvento('NO_AZZERAMENTO', { saldo: saldoCorrente });
+      }
+
+      if (this.display) {
+        this.display.nascondiPulsantiAzzeramento();
+        this.display.mostraMessaggio(`Saldo mantenuto: ${saldoCorrente.toFixed(2)}€`, 'info');
+      }
+
+      log.info(`ℹ️ Saldo mantenuto: ${saldoCorrente.toFixed(2)}€`);
+    }
+
+    // Chiudi operazione manutenzione
+    this.operazioneCorrente = null;
+
+    // Torna a IDLE dopo 3 secondi
+    setTimeout(() => {
+      this.transizione('IDLE');
+    }, 3000);
+  }
+
+  /**
+   * FEATURE 003: Entra in stato MANUTENZIONE_AUTH_PENDING
+   */
+  onEntraManutenzioneAuthPending() {
+    // Disabilita tutti input TRANNE lettore carte (serve per autenticazione operatore)
+    this.abilitaInput(false, ['carta']);
+
+    this.operazioneCorrente = this.gestoreManutenzione.iniziaOperazione();
+
+    this.gestoreManutenzione.avviaCountdown(() => {
+      if (this.operazioneCorrente) {
+        this.operazioneCorrente.logEvento('TIMEOUT');
+      }
+      this.transizione('FUORI_SERVIZIO');
+    });
+
+    if (this.display) {
+      this.display.mostraMessaggio('Cassetta aperta - Autenticazione richiesta', 'warning');
+    }
+
+    log.info('🔐 Manutenzione: attesa autenticazione operatore (10s)');
+  }
+
+  /**
+   * FEATURE 003: Entra in stato MANUTENZIONE_ATTESA_CHIUSURA
+   */
+  onEntraManutenzioneAttesaChiusura() {
+    this.gestoreManutenzione.fermaCountdown();
+
+    const codice = this.operazioneCorrente?.codiceOperatore || 'N/A';
+    if (this.display) {
+      this.display.mostraMessaggio(`Operatore autorizzato (${codice}) - Attesa chiusura cassetta`, 'success');
+    }
+
+    log.info(`✅ Operatore ${codice} autenticato - Attesa chiusura cassetta`);
+  }
+
+  /**
+   * FEATURE 003: Entra in stato MANUTENZIONE_SCELTA_AZZERAMENTO
+   */
+  onEntraManutenzioneSceltaAzzeramento() {
+    const saldo = this.gettoniera ? this.gettoniera.getSaldoMonete() : 0;
+
+    if (this.display) {
+      this.display.mostraPulsantiAzzeramento(saldo);
+    }
+
+    log.info(`💰 Scelta azzeramento - Saldo corrente: ${saldo.toFixed(2)}€`);
+  }
+
+  /**
+   * FEATURE 003: Entra in stato FUORI_SERVIZIO
+   */
+  onEntraFuoriServizio() {
+    this.suoneria.attiva();
+
+    // Disabilita tutti input TRANNE lettore carte (serve per reset da operatore)
+    this.abilitaInput(false, ['carta']);
+
+    if (this.display) {
+      this.display.mostraFuoriServizio();
+    }
+
+    if (this.operazioneCorrente) {
+      this.operazioneCorrente.logEvento('FUORI_SERVIZIO');
+    }
+
+    log.error('🚨 Sistema in FUORI SERVIZIO - Suoneria attivata');
+  }
+
+  /**
+   * FEATURE 003: Reset da FUORI_SERVIZIO con carta autorizzata
+   */
+  resetDaFuoriServizio(codiceOperatore) {
+    if (!Validatore.isCodiceAutorizzato(codiceOperatore)) {
+      if (this.display) {
+        this.display.mostraMessaggio(`Accesso negato (${codiceOperatore})`, 'error');
+      }
+      setTimeout(() => {
+        if (this.display) {
+          this.display.mostraFuoriServizio();
+        }
+      }, 2000);
+      return;
+    }
+
+    // Reset valido
+    const operazione = new OperazioneSvuotamento();
+    operazione.logEvento('RESET', { codice: codiceOperatore });
+
+    this.suoneria.disattiva();
+
+    if (this.display) {
+      this.display.mostraMessaggio(`Sistema ripristinato da operatore (${codiceOperatore})`, 'success');
+    }
+
+    setTimeout(() => {
+      this.transizione('IDLE');
+    }, 3000);
+
+    log.info(`✅ Reset da FUORI_SERVIZIO - Operatore: ${codiceOperatore}`);
+  }
+
+  /**
+   * FEATURE 003: Modifica verificaCarta per gestire autenticazione operatore
+   */
+  verificaCarta(codice) {
+    // Reset da FUORI_SERVIZIO
+    if (this.stato === 'FUORI_SERVIZIO') {
+      this.resetDaFuoriServizio(codice);
+      return;
+    }
+
+    // Autenticazione operatore durante manutenzione
+    if (this.stato === 'MANUTENZIONE_AUTH_PENDING') {
+      if (Validatore.isCodiceAutorizzato(codice)) {
+        this.gestoreManutenzione.fermaCountdown();
+        if (this.operazioneCorrente) {
+          this.operazioneCorrente.logEvento('AUTH_SUCCESS', { codice });
+        }
+        this.transizione('MANUTENZIONE_ATTESA_CHIUSURA');
+      } else {
+        if (this.operazioneCorrente) {
+          this.operazioneCorrente.logEvento('AUTH_FAIL', { codice });
+        }
+        if (this.display) {
+          this.display.mostraMessaggio(`Accesso negato (${codice})`, 'error');
+        }
+        setTimeout(() => {
+          if (this.display) {
+            this.display.mostraMessaggio('Cassetta aperta - Autenticazione richiesta', 'warning');
+          }
+        }, 2000);
+      }
+      return;
+    }
+
+    // Verifica carta autorizzata normale (feature 001)
+    const autorizzato = Validatore.isCodiceAutorizzato(codice);
+    if (autorizzato) {
+      log.info(`✅ Carta ${codice}: AUTORIZZATA`);
+      this.display.mostraMessaggio('Accesso autorizzato', 'success');
+      setTimeout(() => this.transizione('PORTA_APERTA', { motivo: 'carta' }), 1000);
+    } else {
+      log.warn(`⚠️ Carta ${codice}: NON AUTORIZZATA`);
+      this.display.mostraMessaggio('Accesso negato', 'error');
+      setTimeout(() => this.transizione('IDLE'), 2000);
+    }
+  }
+
+  /**
    * Reset completo del chiosco (per debugging)
    */
   reset() {
     log.warn('🔄 Reset manuale chiosco');
+    if (this.suoneria?.isAttiva()) {
+      this.suoneria.disattiva();
+    }
+    if (this.gestoreManutenzione) {
+      this.gestoreManutenzione.fermaCountdown();
+    }
     this.transizione('IDLE');
   }
 }
