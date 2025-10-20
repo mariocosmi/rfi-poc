@@ -28,6 +28,25 @@ Questo documento traccia il debito tecnico identificato nel progetto, in partico
 - Gestione errori DOM consistente
 - Helper riutilizzabili per future feature
 
+### ✅ Sprint 2 (2025-10-20) - Priorità MEDIA
+**Commit**: `d434a49`
+**Effort**: 6h pianificate, completato in 1 sessione
+**Violazioni risolte**: TD-004 (già risolto), TD-005
+
+**Risultati**:
+- ✅ Creata classe `CountdownTimer` in `js/utils.js` (+120 linee)
+- ✅ Refactored `GestoreTimeout` in `js/chiosco.js`: 63→44 linee (-30%)
+- ✅ Refactored `GestoreManutenzione` in `js/gestore-manutenzione.js`: 94→67 linee (-29%)
+- ✅ Eliminati 2 pattern countdown duplicati
+- ✅ Investimento netto: +74 linee (helper riutilizzabile)
+- ✅ Test E2E: 6/6 passati, 0 regressioni
+
+**Benefici**:
+- Gestione countdown centralizzata (timer + intervalli)
+- Prevenzione future duplicazioni (soglia 3+ rispettata)
+- Testabilità migliorata (logica isolata)
+- API consistente per tutti i countdown
+
 ---
 
 ## Violazioni Alta Priorità
@@ -58,24 +77,21 @@ Questo documento traccia il debito tecnico identificato nel progetto, in partico
 
 ## Violazioni Media Priorità
 
-### TD-004: Pattern Log Click (9 occorrenze)
+### ✅ TD-004: Pattern Log Click (9 occorrenze) - COMPLETATO
+**Status**: ✅ Risolto in Sprint 1 (commit `545bf94`)
 **File**: `js/app.js`
-**Impatto**: MEDIO - Ridondanza, inconsistenze formato log
-
-**Refactoring proposto**: Integrare in `registraClickHandler` con parametro nome azione
-
-**Stima effort**: 1h (parte di TD-003)
+**Soluzione**: Parametro `nomeAzione` in `registraClickHandler()` centralizza logging
+**Risultato**: Pattern duplicato eliminato come parte di TD-003
 
 ---
 
-### TD-005: Pattern Countdown Timer (3 classi)
-**File**: `js/chiosco.js` (GestoreTimeout), `js/gestore-manutenzione.js` (GestoreManutenzione), `js/chiosco.js` (onEntraPortaAperta)
-**Impatto**: MEDIO - Codice duplicato complesso, difficile testing
+### ✅ TD-005: Pattern Countdown Timer (3 classi) - COMPLETATO
+**Status**: ✅ Risolto in Sprint 2 (commit `d434a49`)
+**File**: `js/chiosco.js`, `js/gestore-manutenzione.js`
+**Soluzione**: Classe `CountdownTimer` riutilizzabile in `js/utils.js`
+**Risultato**: -46 linee duplicate + 120 linee helper = investimento +74 linee
 
-**Refactoring proposto**: Classe base riutilizzabile `CountdownTimer` in `utils.js`
-
-**Stima effort**: 5h
-**Beneficio**: -60 linee, testabilità migliorata
+**Note**: Timeout porta (1 occorrenza) valutato e considerato accettabile (sotto soglia 3, pattern diverso)
 
 ---
 
@@ -127,11 +143,12 @@ Questo documento traccia il debito tecnico identificato nel progetto, in partico
 **Outcome Pianificato**: Riduzione ~140 linee, miglioramento manutenibilità core features
 **Outcome Effettivo**: Riduzione 135 linee, manutenibilità migliorata, 0 regressioni
 
-### Sprint 2 (Priorità MEDIA)
-- [ ] TD-004: Pattern log click (integrato con TD-003)
-- [ ] TD-005: Pattern countdown timer
+### ✅ Sprint 2 (Priorità MEDIA) - COMPLETATO
+- [x] TD-004: Pattern log click (già risolto in Sprint 1)
+- [x] TD-005: Pattern countdown timer
 
-**Outcome**: Riduzione ulteriori ~60 linee, testabilità migliorata
+**Outcome Pianificato**: Riduzione ulteriori ~60 linee, testabilità migliorata
+**Outcome Effettivo**: Investimento +74 linee (CountdownTimer riutilizzabile), -46 linee duplicate, testabilità migliorata, 0 regressioni
 
 ### Sprint 3 (Priorità BASSA - Opzionale)
 - [ ] TD-006, TD-007, TD-008: Cleanup helper vari
