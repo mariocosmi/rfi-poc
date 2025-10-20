@@ -79,7 +79,7 @@ class Display {
 
     const importoFormattato = importo.toFixed(2).replace('.', ',');
     this.elementoImporto.textContent = `Rimanente: ${importoFormattato} €`;
-    this.elementoImporto.classList.remove('hidden');
+    mostraElemento(this.elementoImporto);
 
     log.debug(`📺 Display importo: ${importoFormattato} €`);
   }
@@ -88,9 +88,7 @@ class Display {
    * Nascondi importo
    */
   nascondiImporto() {
-    if (this.elementoImporto) {
-      this.elementoImporto.classList.add('hidden');
-    }
+    nascondiElemento(this.elementoImporto);
   }
 
   /**
@@ -102,7 +100,7 @@ class Display {
 
     if (secondi > 0) {
       this.elementoCountdown.textContent = `⏱️ Timeout: ${secondi}s`;
-      this.elementoCountdown.classList.remove('hidden');
+      mostraElemento(this.elementoCountdown);
     } else {
       this.nascondiCountdown();
     }
@@ -112,9 +110,7 @@ class Display {
    * Nascondi countdown
    */
   nascondiCountdown() {
-    if (this.elementoCountdown) {
-      this.elementoCountdown.classList.add('hidden');
-    }
+    nascondiElemento(this.elementoCountdown);
   }
 
   /**
@@ -139,7 +135,7 @@ class Display {
 
     if (secondi > 0) {
       elementoTimer.textContent = `${secondi} secondi rimasti`;
-      elementoTimer.classList.remove('hidden');
+      mostraElemento(elementoTimer);
 
       // Aggiungi classe 'urgente' se <= 3 secondi (stile rosso)
       if (secondi <= 3) {
@@ -150,7 +146,7 @@ class Display {
 
       log.debug(`Display: countdown manutenzione aggiornato a ${secondi}s`);
     } else {
-      elementoTimer.classList.add('hidden');
+      nascondiElemento(elementoTimer);
       elementoTimer.classList.remove('urgente');
     }
   }
@@ -174,7 +170,7 @@ class Display {
 
     btnSi.disabled = false;
     btnNo.disabled = false;
-    container.classList.remove('hidden');
+    mostraElemento(container);
 
     log.info(`Display: pulsanti azzeramento mostrati (saldo: ${saldoFormattato} €)`);
   }
@@ -191,7 +187,7 @@ class Display {
 
     btnSi.disabled = true;
     btnNo.disabled = true;
-    container.classList.add('hidden');
+    nascondiElemento(container);
 
     log.debug('Display: pulsanti azzeramento nascosti');
   }

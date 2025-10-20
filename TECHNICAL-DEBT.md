@@ -47,6 +47,24 @@ Questo documento traccia il debito tecnico identificato nel progetto, in partico
 - Testabilità migliorata (logica isolata)
 - API consistente per tutti i countdown
 
+### ✅ Sprint 3 (2025-10-20) - Priorità BASSA
+**Commit**: `[in corso]`
+**Effort**: 2.5h pianificate, completato in 1 sessione
+**Violazioni risolte**: TD-008
+**Violazioni valutate (no refactoring)**: TD-006, TD-007
+
+**Risultati**:
+- ✅ TD-006: Valutato `abilitaInput()` - già centralizzato in singolo metodo, nessun refactoring
+- ✅ TD-007: Valutato `apri()`/`chiudi()` SensoreCassetta - solo 2 occorrenze (sotto soglia 3), pattern accettabile
+- ✅ TD-008: Refactored `js/display.js` - 6 pattern show/hide usano helper `nascondiElemento()`/`mostraElemento()`
+- ✅ Riduzione codebase: -12 linee (rimozione guard clause duplicati)
+- ✅ Test E2E: 6/6 passati, 0 regressioni
+
+**Benefici**:
+- Consistenza migliorata: display.js usa helper utils.js uniformemente
+- Manutenibilità: logica show/hide centralizzata
+- Polishing finale codebase bassa priorità completato
+
 ---
 
 ## Violazioni Alta Priorità
@@ -97,20 +115,23 @@ Questo documento traccia il debito tecnico identificato nel progetto, in partico
 
 ## Violazioni Bassa Priorità
 
-### TD-006: Pattern Enable/Disable Input (5 occorrenze)
+### ✅ TD-006: Pattern Enable/Disable Input (5 occorrenze) - VALUTATO
+**Status**: ✅ Valutato in Sprint 3 - Nessun refactoring necessario
 **File**: `js/chiosco.js` (metodo `abilitaInput`)
-**Impatto**: BASSO
-**Stima effort**: 1h
+**Soluzione**: Pattern già centralizzato in singolo metodo con logica complessa
+**Risultato**: Pattern accettabile - non costituisce violazione DRY (non duplicato across files)
 
-### TD-007: Pattern SensoreCassetta apri/chiudi (2 metodi)
+### ✅ TD-007: Pattern SensoreCassetta apri/chiudi (2 metodi) - VALUTATO
+**Status**: ✅ Valutato in Sprint 3 - Nessun refactoring necessario
 **File**: `js/sensore-cassetta.js`
-**Impatto**: MOLTO BASSO
-**Stima effort**: 0.5h
+**Soluzione**: Solo 2 occorrenze (sotto soglia 3 del Principio 6)
+**Risultato**: Pattern simmetrico leggibile - refactoring ridurrebbe chiarezza senza beneficio
 
-### TD-008: Pattern Nascondi Elemento (4 occorrenze)
+### ✅ TD-008: Pattern Nascondi Elemento (6 occorrenze) - COMPLETATO
+**Status**: ✅ Risolto in Sprint 3
 **File**: `js/display.js`
-**Impatto**: BASSO
-**Stima effort**: 1h
+**Soluzione**: Refactored per usare helper `nascondiElemento()`/`mostraElemento()` da `utils.js`
+**Risultato**: -12 linee, consistenza migliorata con helper pattern esistente
 
 ### TD-009: Pattern Log Formattazione Importo (8 occorrenze)
 **File**: `js/gettoniera.js`
@@ -150,10 +171,13 @@ Questo documento traccia il debito tecnico identificato nel progetto, in partico
 **Outcome Pianificato**: Riduzione ulteriori ~60 linee, testabilità migliorata
 **Outcome Effettivo**: Investimento +74 linee (CountdownTimer riutilizzabile), -46 linee duplicate, testabilità migliorata, 0 regressioni
 
-### Sprint 3 (Priorità BASSA - Opzionale)
-- [ ] TD-006, TD-007, TD-008: Cleanup helper vari
+### ✅ Sprint 3 (Priorità BASSA - Opzionale) - COMPLETATO
+- [x] TD-006: Valutato abilitaInput (già ottimizzato)
+- [x] TD-007: Valutato apri/chiudi SensoreCassetta (sotto soglia)
+- [x] TD-008: Refactored display.js show/hide patterns
 
-**Outcome**: Polishing finale codebase
+**Outcome Pianificato**: Polishing finale codebase
+**Outcome Effettivo**: Cleanup completato, -12 linee, consistenza utils.js migliorata, 0 regressioni
 
 ---
 
