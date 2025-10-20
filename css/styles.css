@@ -16,34 +16,34 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 15px;
 }
 
 .chiosco-container {
   background: white;
-  border-radius: 20px;
+  border-radius: 15px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  padding: 40px;
-  max-width: 1200px;
+  padding: 25px;
+  max-width: 1850px;
   width: 100%;
-  min-height: 800px;
+  min-height: auto;
 }
 
 .chiosco-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 15px;
   color: #333;
 }
 
 .chiosco-header h1 {
-  font-size: 2.5rem;
+  font-size: 1.8rem;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   color: #667eea;
 }
 
 .chiosco-header p {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   color: #666;
 }
 
@@ -51,8 +51,8 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto 1fr;
-  gap: 30px;
-  min-height: 600px;
+  gap: 20px;
+  min-height: auto;
 }
 
 .display-area {
@@ -62,7 +62,7 @@ body {
 .input-area {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 
 .porta-area {
