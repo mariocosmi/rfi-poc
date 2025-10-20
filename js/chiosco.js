@@ -671,61 +671,45 @@ class Chiosco {
 
 /**
  * GestoreTimeout - Gestisce timeout inattività con countdown
+ *
+ * Refactored per usare CountdownTimer (TD-005)
  */
 class GestoreTimeout {
   constructor(chiosco, durataSecondi = 20) {
     this.chiosco = chiosco;
-    this.durata = durataSecondi * 1000;
     this.durataSecondi = durataSecondi;
-    this.timer = null;
-    this.intervalloConto = null;
-    this.secondiRimanenti = durataSecondi;
+
+    // Usa CountdownTimer con callbacks
+    this.countdown = new CountdownTimer(
+      durataSecondi,
+      // onTick: aggiorna display ogni secondo
+      (secondi) => {
+        if (this.chiosco.display) {
+          this.chiosco.display.aggiornaCountdown(secondi);
+        }
+        log.debug(`⏱️ Countdown: ${secondi}s rimanenti`);
+      },
+      // onComplete: transizione a TIMEOUT
+      () => {
+        log.warn('⏱️ Timeout scaduto');
+        this.chiosco.transizione('TIMEOUT');
+      }
+    );
   }
 
   /**
    * Avvia timeout
    */
   avvia() {
-    this.reset();
-    this.secondiRimanenti = this.durataSecondi;
-
     log.debug(`⏱️ Timer timeout avviato: ${this.durataSecondi} secondi`);
-
-    // Timer principale per timeout
-    this.timer = setTimeout(() => {
-      log.warn('⏱️ Timeout scaduto');
-      this.chiosco.transizione('TIMEOUT');
-    }, this.durata);
-
-    // Intervallo per aggiornare countdown display
-    this.intervalloConto = setInterval(() => {
-      this.secondiRimanenti--;
-
-      if (this.chiosco.display) {
-        this.chiosco.display.aggiornaCountdown(this.secondiRimanenti);
-      }
-
-      log.debug(`⏱️ Countdown: ${this.secondiRimanenti}s rimanenti`);
-
-      if (this.secondiRimanenti <= 0) {
-        clearInterval(this.intervalloConto);
-      }
-    }, 1000);
+    this.countdown.avvia();
   }
 
   /**
    * Reset timeout
    */
   reset() {
-    if (this.timer) {
-      clearTimeout(this.timer);
-      this.timer = null;
-    }
-
-    if (this.intervalloConto) {
-      clearInterval(this.intervalloConto);
-      this.intervalloConto = null;
-    }
+    this.countdown.reset();
 
     // Nascondi countdown su display
     if (this.chiosco?.display) {

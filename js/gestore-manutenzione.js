@@ -10,9 +10,8 @@
 class GestoreManutenzione {
   constructor(chiosco) {
     this.chiosco = chiosco;
-    this.timerCountdown = null;
-    this.secondiRimanenti = 10;
     this.operazioneCorrente = null;
+    this.countdown = null;
 
     log.debug('GestoreManutenzione: inizializzato');
   }
@@ -20,53 +19,50 @@ class GestoreManutenzione {
   /**
    * Avvia countdown 10 secondi
    * @param {Function} callback - Chiamato quando countdown raggiunge 0 (timeout)
+   *
+   * Refactored per usare CountdownTimer (TD-005)
    */
   avviaCountdown(callback) {
     // Ferma countdown precedente se presente
-    if (this.timerCountdown) {
+    if (this.countdown) {
       this.fermaCountdown();
     }
 
-    this.secondiRimanenti = 10;
-    this.aggiornaDisplay();
-
     log.debug('GestoreManutenzione: countdown avviato (10s)');
 
-    this.timerCountdown = setInterval(() => {
-      this.secondiRimanenti--;
-      this.aggiornaDisplay();
+    // Crea nuovo CountdownTimer
+    this.countdown = new CountdownTimer(
+      10,
+      // onTick: aggiorna display e log warnings
+      (secondi) => {
+        if (this.chiosco?.display) {
+          this.chiosco.display.aggiornaCountdownManutenzione(secondi);
+        }
 
-      log.debug(`GestoreManutenzione: countdown ${this.secondiRimanenti}s rimasti`);
+        log.debug(`GestoreManutenzione: countdown ${secondi}s rimasti`);
 
-      if (this.secondiRimanenti <= 3) {
-        log.warn(`GestoreManutenzione: countdown urgente - ${this.secondiRimanenti}s rimasti`);
-      }
-
-      if (this.secondiRimanenti <= 0) {
-        this.fermaCountdown();
+        if (secondi <= 3 && secondi > 0) {
+          log.warn(`GestoreManutenzione: countdown urgente - ${secondi}s rimasti`);
+        }
+      },
+      // onComplete: chiama callback timeout
+      () => {
         log.error('GestoreManutenzione: timeout countdown (0s) - chiamata callback');
         callback();
       }
-    }, 1000);
+    );
+
+    this.countdown.avvia();
   }
 
   /**
    * Ferma countdown e pulisce timer
    */
   fermaCountdown() {
-    if (this.timerCountdown) {
-      clearInterval(this.timerCountdown);
-      this.timerCountdown = null;
+    if (this.countdown) {
+      this.countdown.ferma();
+      this.countdown = null;
       log.debug('GestoreManutenzione: countdown fermato');
-    }
-  }
-
-  /**
-   * Aggiorna display con secondi rimanenti
-   */
-  aggiornaDisplay() {
-    if (this.chiosco && this.chiosco.display) {
-      this.chiosco.display.aggiornaCountdownManutenzione(this.secondiRimanenti);
     }
   }
 

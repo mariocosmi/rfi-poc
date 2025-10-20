@@ -96,3 +96,124 @@ function mostraElemento(elemento) {
     elemento.classList.remove('hidden');
   }
 }
+
+/**
+ * CountdownTimer - Classe base riutilizzabile per gestione countdown
+ *
+ * Centralizza la logica comune per timer con countdown visibile.
+ * Elimina duplicazione tra GestoreTimeout, GestoreManutenzione e timeout porta.
+ *
+ * @example
+ * const timer = new CountdownTimer(20, (secondi) => {
+ *   console.log(`Rimangono ${secondi}s`);
+ * }, () => {
+ *   console.log('Timeout scaduto!');
+ * });
+ * timer.avvia();
+ */
+class CountdownTimer {
+  /**
+   * @param {number} durataSecondi - Durata countdown in secondi
+   * @param {Function} onTick - Callback chiamato ogni secondo con secondi rimanenti
+   * @param {Function} onComplete - Callback chiamato al termine del countdown
+   */
+  constructor(durataSecondi, onTick = null, onComplete = null) {
+    this.durata = durataSecondi;
+    this.onTick = onTick;
+    this.onComplete = onComplete;
+    this.timer = null;
+    this.intervallo = null;
+    this.secondiRimanenti = durataSecondi;
+    this._isRunning = false;
+  }
+
+  /**
+   * Avvia il countdown
+   * Se già in esecuzione, viene prima fermato e poi riavviato
+   */
+  avvia() {
+    // Se già in esecuzione, ferma prima
+    if (this._isRunning) {
+      this.ferma();
+    }
+
+    this.secondiRimanenti = this.durata;
+    this._isRunning = true;
+
+    // Chiama onTick immediatamente per mostrare stato iniziale
+    if (this.onTick) {
+      this.onTick(this.secondiRimanenti);
+    }
+
+    // Timer principale: scatta al termine del countdown
+    this.timer = setTimeout(() => {
+      this._isRunning = false;
+      if (this.onComplete) {
+        this.onComplete();
+      }
+    }, this.durata * 1000);
+
+    // Intervallo: aggiorna ogni secondo
+    this.intervallo = setInterval(() => {
+      this.secondiRimanenti--;
+
+      if (this.onTick) {
+        this.onTick(this.secondiRimanenti);
+      }
+
+      // Ferma intervallo quando raggiunge 0
+      if (this.secondiRimanenti <= 0) {
+        if (this.intervallo) {
+          clearInterval(this.intervallo);
+          this.intervallo = null;
+        }
+      }
+    }, 1000);
+
+    log.debug(`⏱️ CountdownTimer avviato: ${this.durata}s`);
+  }
+
+  /**
+   * Ferma il countdown e pulisce i timer
+   * Alias per reset() per compatibilità con codice esistente
+   */
+  ferma() {
+    this.reset();
+  }
+
+  /**
+   * Resetta il countdown e pulisce i timer
+   */
+  reset() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+
+    if (this.intervallo) {
+      clearInterval(this.intervallo);
+      this.intervallo = null;
+    }
+
+    this._isRunning = false;
+    this.secondiRimanenti = this.durata;
+
+    log.debug('⏱️ CountdownTimer fermato');
+  }
+
+  /**
+   * Verifica se il countdown è in esecuzione
+   * @returns {boolean}
+   */
+  isRunning() {
+    return this._isRunning;
+  }
+
+  /**
+   * Ottiene i secondi rimanenti
+   * @returns {number}
+   */
+  getSecondiRimanenti() {
+    return this.secondiRimanenti;
+  }
+}
