@@ -135,28 +135,11 @@ class LettoreCarte {
 
     log.debug(`💳 Verifica carta autorizzata: "${codice}"`);
 
-    this.chiosco.display.mostraMessaggio('Verifica in corso...', 'info');
+    // Usa helper DRY centralizzato
+    this.chiosco.verificaAccessoConCodice(codice, 'Carta contactless');
 
-    setTimeout(() => {
-      const autorizzato = Validatore.isCodiceAutorizzato(codice);
-
-      if (autorizzato) {
-        log.info(`✅ Carta contactless ${codice}: AUTORIZZATA`);
-        this.chiosco.display.mostraMessaggio('Accesso autorizzato', 'successo');
-        setTimeout(() => {
-          this.chiosco.transizione('PORTA_APERTA', { motivo: 'carta-autorizzata' });
-        }, 1000);
-      } else {
-        log.warn(`⚠️ Carta contactless ${codice}: NON AUTORIZZATA`);
-        this.chiosco.display.mostraMessaggio('Accesso negato - Effettua pagamento', 'errore');
-        setTimeout(() => {
-          this.chiosco.transizione('IDLE');
-        }, 2000);
-      }
-
-      // Input carta rimane sempre visibile (gestito da abilitaInput)
-      this.modalita = null;
-    }, 500);
+    // Input carta rimane sempre visibile (gestito da abilitaInput)
+    this.modalita = null;
   }
 
   /**

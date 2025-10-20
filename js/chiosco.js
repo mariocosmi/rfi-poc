@@ -202,25 +202,8 @@ class Chiosco {
     // Disabilita tutti gli input
     this.abilitaInput(false);
 
-    // Mostra verifica in corso
-    if (this.display) {
-      this.display.mostraMessaggio('Verifica in corso...', 'info');
-    }
-
-    // Verifica codice
-    setTimeout(() => {
-      const autorizzato = Validatore.isCodiceAutorizzato(codice);
-
-      if (autorizzato) {
-        log.info(`✅ QR code ${codice}: AUTORIZZATO`);
-        this.display.mostraMessaggio('Accesso autorizzato', 'successo');
-        setTimeout(() => this.transizione('PORTA_APERTA', { motivo: 'qr' }), 1000);
-      } else {
-        log.warn(`⚠️ QR code ${codice}: NON AUTORIZZATO`);
-        this.display.mostraMessaggio('Accesso negato', 'errore');
-        setTimeout(() => this.transizione('IDLE'), 2000);
-      }
-    }, 500);
+    // Usa helper DRY per verifica
+    this.verificaAccessoConCodice(codice, 'QR code');
   }
 
   /**
@@ -604,6 +587,36 @@ class Chiosco {
   }
 
   /**
+   * Helper per verifica accesso con codice autorizzato (DRY helper)
+   * Centralizza logica comune per QR e carte autorizzate
+   *
+   * @param {string} codice - Codice da verificare
+   * @param {string} tipoIngresso - Tipo ingresso ('QR', 'Carta', ecc.) per logging
+   */
+  verificaAccessoConCodice(codice, tipoIngresso) {
+    if (!this.display) {
+      log.warn('verificaAccessoConCodice: display non disponibile');
+      return;
+    }
+
+    this.display.mostraMessaggio('Verifica in corso...', 'info');
+
+    setTimeout(() => {
+      const autorizzato = Validatore.isCodiceAutorizzato(codice);
+
+      if (autorizzato) {
+        log.info(`✅ ${tipoIngresso} ${codice}: AUTORIZZATO`);
+        this.display.mostraMessaggio('Accesso autorizzato', 'successo');
+        setTimeout(() => this.transizione('PORTA_APERTA', { motivo: tipoIngresso.toLowerCase() }), 1000);
+      } else {
+        log.warn(`⚠️ ${tipoIngresso} ${codice}: NON AUTORIZZATO`);
+        this.display.mostraMessaggio('Accesso negato', 'errore');
+        setTimeout(() => this.transizione('IDLE'), 2000);
+      }
+    }, 500);
+  }
+
+  /**
    * FEATURE 003: Modifica verificaCarta per gestire autenticazione operatore
    */
   verificaCarta(codice) {
@@ -637,17 +650,8 @@ class Chiosco {
       return;
     }
 
-    // Verifica carta autorizzata normale (feature 001)
-    const autorizzato = Validatore.isCodiceAutorizzato(codice);
-    if (autorizzato) {
-      log.info(`✅ Carta ${codice}: AUTORIZZATA`);
-      this.display.mostraMessaggio('Accesso autorizzato', 'success');
-      setTimeout(() => this.transizione('PORTA_APERTA', { motivo: 'carta' }), 1000);
-    } else {
-      log.warn(`⚠️ Carta ${codice}: NON AUTORIZZATA`);
-      this.display.mostraMessaggio('Accesso negato', 'error');
-      setTimeout(() => this.transizione('IDLE'), 2000);
-    }
+    // Verifica carta autorizzata normale (feature 001) - usa helper DRY
+    this.verificaAccessoConCodice(codice, 'Carta');
   }
 
   /**

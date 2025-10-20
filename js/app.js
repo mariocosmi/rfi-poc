@@ -57,12 +57,7 @@
       pulsantiMonete.forEach(btn => {
         btn.addEventListener('click', function() {
           const valore = parseFloat(this.getAttribute('data-valore'));
-
-          log.debug(`🖱️ Click pulsante moneta: ${valore}€`);
-
-          // Aggiungi animazione click
-          this.classList.add('clicked');
-          setTimeout(() => this.classList.remove('clicked'), 200);
+          aggiungiAnimazioneClick(this, `Moneta ${valore}€`);
 
           // Se siamo in IDLE, passa a PAGAMENTO_MONETE
           if (chiosco.stato === 'IDLE') {
@@ -91,29 +86,17 @@
       });
 
       // Event handler "Paga con Carta" (pagamento VISA)
-      const btnPagaCarta = document.getElementById('btn-paga-carta');
-      if (btnPagaCarta) {
-        btnPagaCarta.addEventListener('click', function() {
-          log.debug('🖱️ Click "Paga con Carta"');
+      registraClickHandler('btn-paga-carta', function() {
+        if (chiosco.stato === 'IDLE') {
+          chiosco.transizione('PAGAMENTO_CARTA');
+        } else {
+          log.warn('⚠️ Pagamento carta richiesto ma stato non è IDLE');
+        }
+      }, 'Paga con Carta');
 
-          // Aggiungi animazione click
-          this.classList.add('clicked');
-          setTimeout(() => this.classList.remove('clicked'), 200);
-
-          // Transizione a PAGAMENTO_CARTA
-          if (chiosco.stato === 'IDLE') {
-            chiosco.transizione('PAGAMENTO_CARTA');
-          } else {
-            log.warn('⚠️ Pagamento carta richiesto ma stato non è IDLE');
-          }
-        });
-      }
-
-      // Event handler "Verifica Carta" (logica contestuale come QR)
-      const btnVerificaCarta = document.getElementById('btn-verifica-carta');
+      // Event handler "Verifica Carta" (logica contestuale)
       const inputCarta = document.getElementById('input-carta');
-
-      if (btnVerificaCarta && inputCarta) {
+      if (inputCarta) {
         const verificaCarta = () => {
           const codice = inputCarta.value.trim();
 
@@ -125,9 +108,10 @@
 
           log.debug(`🖱️ Verifica carta: "${codice}"`);
 
-          // Aggiungi animazione click
-          btnVerificaCarta.classList.add('clicked');
-          setTimeout(() => btnVerificaCarta.classList.remove('clicked'), 200);
+          const btnVerificaCarta = document.getElementById('btn-verifica-carta');
+          if (btnVerificaCarta) {
+            aggiungiAnimazioneClick(btnVerificaCarta);
+          }
 
           // Chiama verificaCarta che gestisce logica contestuale
           chiosco.verificaCarta(codice);
@@ -136,7 +120,7 @@
           inputCarta.value = '';
         };
 
-        btnVerificaCarta.addEventListener('click', verificaCarta);
+        registraClickHandler('btn-verifica-carta', verificaCarta, null, false);
 
         // Enter key su input carta
         inputCarta.addEventListener('keypress', function(e) {
@@ -147,10 +131,8 @@
       }
 
       // Event handler "Scansiona QR"
-      const btnScansioneQR = document.getElementById('btn-scansiona-qr');
       const inputQR = document.getElementById('input-qr');
-
-      if (btnScansioneQR && inputQR) {
+      if (inputQR) {
         const scansioneQR = () => {
           const codice = inputQR.value.trim();
 
@@ -162,9 +144,10 @@
 
           log.debug(`🖱️ Scansione QR: "${codice}"`);
 
-          // Aggiungi animazione click
-          btnScansioneQR.classList.add('clicked');
-          setTimeout(() => btnScansioneQR.classList.remove('clicked'), 200);
+          const btnScansioneQR = document.getElementById('btn-scansiona-qr');
+          if (btnScansioneQR) {
+            aggiungiAnimazioneClick(btnScansioneQR);
+          }
 
           // Transizione a VERIFICA_QR
           chiosco.transizione('VERIFICA_QR', { codice });
@@ -173,7 +156,7 @@
           inputQR.value = '';
         };
 
-        btnScansioneQR.addEventListener('click', scansioneQR);
+        registraClickHandler('btn-scansiona-qr', scansioneQR, null, false);
 
         // Enter key su input QR
         inputQR.addEventListener('keypress', function(e) {
@@ -184,79 +167,33 @@
       }
 
       // FEATURE 002: Event handler "Persona passata"
-      const btnPassaggioPersona = document.getElementById('btn-passaggio-persona');
-      if (btnPassaggioPersona) {
-        btnPassaggioPersona.addEventListener('click', function() {
-          log.debug('🖱️ Click "Persona passata"');
+      registraClickHandler('btn-passaggio-persona', function() {
+        chiosco.onPassaggioPersona();
+      }, 'Persona passata');
 
-          // Aggiungi animazione click
-          this.classList.add('clicked');
-          setTimeout(() => this.classList.remove('clicked'), 200);
+      // FEATURE 003: Event handler "Apri Cassetta"
+      registraClickHandler('btn-apri-cassetta', function() {
+        // Simula apertura fisica cassetta → trigger evento sensoreCassetta
+        chiosco.sensoreCassetta.apri();
+      }, 'Apri Cassetta');
 
-          // Chiama handler chiosco
-          chiosco.onPassaggioPersona();
-        });
-      }
+      // FEATURE 003: Event handler "Chiudi Cassetta"
+      registraClickHandler('btn-chiudi-cassetta', function() {
+        // Simula chiusura fisica cassetta → trigger evento sensoreCassetta
+        chiosco.sensoreCassetta.chiudi();
+      }, 'Chiudi Cassetta');
 
-      // FEATURE 003: Event handler "Apri Cassetta" (T030)
-      const btnApriCassetta = document.getElementById('btn-apri-cassetta');
-      if (btnApriCassetta) {
-        btnApriCassetta.addEventListener('click', function() {
-          log.debug('🖱️ Click "Apri Cassetta"');
+      // FEATURE 003: Event handler "Azzera Saldo - Sì"
+      registraClickHandler('btn-azzera-si', function() {
+        // Chiama handler chiosco per azzeramento
+        chiosco.confermaAzzeramento(true);
+      }, 'Azzera Saldo - Sì');
 
-          // Aggiungi animazione click
-          this.classList.add('clicked');
-          setTimeout(() => this.classList.remove('clicked'), 200);
-
-          // Simula apertura fisica cassetta → trigger evento sensoreCassetta
-          chiosco.sensoreCassetta.apri();
-        });
-      }
-
-      // FEATURE 003: Event handler "Chiudi Cassetta" (T030)
-      const btnChiudiCassetta = document.getElementById('btn-chiudi-cassetta');
-      if (btnChiudiCassetta) {
-        btnChiudiCassetta.addEventListener('click', function() {
-          log.debug('🖱️ Click "Chiudi Cassetta"');
-
-          // Aggiungi animazione click
-          this.classList.add('clicked');
-          setTimeout(() => this.classList.remove('clicked'), 200);
-
-          // Simula chiusura fisica cassetta → trigger evento sensoreCassetta
-          chiosco.sensoreCassetta.chiudi();
-        });
-      }
-
-      // FEATURE 003: Event handler "Azzera Saldo - Sì" (T030)
-      const btnAzzeraSi = document.getElementById('btn-azzera-si');
-      if (btnAzzeraSi) {
-        btnAzzeraSi.addEventListener('click', function() {
-          log.debug('🖱️ Click "Azzera Saldo - Sì"');
-
-          // Aggiungi animazione click
-          this.classList.add('clicked');
-          setTimeout(() => this.classList.remove('clicked'), 200);
-
-          // Chiama handler chiosco per azzeramento
-          chiosco.confermaAzzeramento(true);
-        });
-      }
-
-      // FEATURE 003: Event handler "Azzera Saldo - No" (T030)
-      const btnAzzeraNo = document.getElementById('btn-azzera-no');
-      if (btnAzzeraNo) {
-        btnAzzeraNo.addEventListener('click', function() {
-          log.debug('🖱️ Click "Azzera Saldo - No"');
-
-          // Aggiungi animazione click
-          this.classList.add('clicked');
-          setTimeout(() => this.classList.remove('clicked'), 200);
-
-          // Chiama handler chiosco per rifiuto azzeramento
-          chiosco.confermaAzzeramento(false);
-        });
-      }
+      // FEATURE 003: Event handler "Azzera Saldo - No"
+      registraClickHandler('btn-azzera-no', function() {
+        // Chiama handler chiosco per rifiuto azzeramento
+        chiosco.confermaAzzeramento(false);
+      }, 'Azzera Saldo - No');
 
       // Esponi istanze globalmente per debugging
       window.app = {
