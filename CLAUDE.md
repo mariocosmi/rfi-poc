@@ -19,6 +19,7 @@ Il progetto segue una "costituzione" rigorosa:
 3. **JavaScript Vanilla**: Preferenza per vanilla JS (eccezione: libreria logging per osservabilità)
 4. **Build-Free**: Nessun bundler, transpiler o build step - file linkati direttamente
 5. **Osservabilità**: Logging completo su console browser con livelli di gravità (DEBUG, INFO, WARN, ERROR)
+6. **Qualità del Codice**: Produrre codice di elevata qualità evitando ripetizioni eccessive - due occorrenze sono accettabili, tre richiedono refactoring (regola DRY pragmatica)
 
 **Importante**: Qualsiasi violazione di questi principi deve essere documentata in `specs/*/plan.md` sotto "Complexity Tracking" con giustificazione.
 
