@@ -521,6 +521,82 @@
   transform: none;
 }
 
+/* ========== BADGE STATO CASSETTA (Feature 004 - T001) ========== */
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+.badge-chiusa {
+  background-color: #9E9E9E; /* Grigio */
+  color: #FFFFFF;
+}
+
+.badge-aperta {
+  background-color: #4CAF50; /* Verde */
+  color: #FFFFFF;
+}
+
+/* ========== PANNELLO MANUTENZIONE CASSETTA (Feature 004 - T007) ========== */
+.manutenzione-panel {
+  background: #e3f2fd;
+  border: 2px solid #2196F3;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.manutenzione-panel h3 {
+  font-size: 1.1rem;
+  color: #1565C0;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.stato-cassetta {
+  text-align: center;
+  margin-bottom: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #424242;
+}
+
+.controlli-cassetta {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+/* ========== PULSANTI MANUTENZIONE CASSETTA (Feature 004 - T002) ========== */
+.btn-manutenzione {
+  padding: 10px 15px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-weight: 600;
+  flex: 1;
+}
+
+.btn-manutenzione:hover {
+  background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.btn-manutenzione:active {
+  transform: scale(0.98);
+}
+
 /* ========== UTILITY CLASSES ========== */
 .hidden {
   display: none;

@@ -49,6 +49,19 @@
                     </div>
                 </div>
 
+                <!-- Pannello Manutenzione Cassetta (Feature 004 - T007) -->
+                <div class="manutenzione-panel">
+                    <h3>🔧 Manutenzione Cassetta</h3>
+                    <div class="stato-cassetta">
+                        <span>Stato: </span>
+                        <span id="stato-cassetta" class="badge badge-chiusa">CHIUSA</span>
+                    </div>
+                    <div class="controlli-cassetta">
+                        <button id="btn-apri-cassetta-004" class="btn-manutenzione">Apri Cassetta</button>
+                        <button id="btn-chiudi-cassetta-004" class="btn-manutenzione">Chiudi Cassetta</button>
+                    </div>
+                </div>
+
                 <!-- Gettoniera -->
                 <div class="gettoniera">
                     <h3>💰 Gettoniera</h3>
@@ -126,6 +139,7 @@
     <script src="js/sensore-cassetta.js"></script>
     <script src="js/suoneria.js"></script>
     <script src="js/gestore-manutenzione.js"></script>
+    <script src="js/gestore-ui-cassetta.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

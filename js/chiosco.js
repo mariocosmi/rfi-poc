@@ -41,16 +41,21 @@ class Chiosco {
     this.lettoreQR = null;
     this.gestoreTimeout = null;
 
-    // Feature 003: Componenti manutenzione
+    // Feature 003: Componenti manutenzione cassetta
     this.sensoreCassetta = new SensoreCassetta();
     this.suoneria = new Suoneria();
     this.gestoreManutenzione = new GestoreManutenzione(this);
     this.operazioneCorrente = null;
     this.pendenteAperturaCassetta = false;
 
-    // Feature 003: Registra listener sensore cassetta
-    this.sensoreCassetta.on('cassettaAperta', () => this.onCassettaAperta());
-    this.sensoreCassetta.on('cassettaChiusa', () => this.onCassettaChiusa());
+    // Feature 004: Registra listener per eventi cassetta (nuovo pattern)
+    this.sensoreCassetta.on('cambioStato', (dati) => {
+      if (dati.statoNuovo === 'APERTA') {
+        this.onCassettaAperta();
+      } else if (dati.statoNuovo === 'CHIUSA') {
+        this.onCassettaChiusa();
+      }
+    });
 
     log.info('🏗️ Chiosco inizializzato - Stato: IDLE');
   }

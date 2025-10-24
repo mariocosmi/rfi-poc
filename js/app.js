@@ -173,14 +173,14 @@
 
       // FEATURE 003: Event handler "Apri Cassetta"
       registraClickHandler('btn-apri-cassetta', function() {
-        // Simula apertura fisica cassetta → trigger evento sensoreCassetta
-        chiosco.sensoreCassetta.apri();
+        // Simula apertura fisica cassetta → trigger evento sensoreCassetta (Feature 004 API)
+        chiosco.sensoreCassetta.notificaApertura();
       }, 'Apri Cassetta');
 
       // FEATURE 003: Event handler "Chiudi Cassetta"
       registraClickHandler('btn-chiudi-cassetta', function() {
-        // Simula chiusura fisica cassetta → trigger evento sensoreCassetta
-        chiosco.sensoreCassetta.chiudi();
+        // Simula chiusura fisica cassetta → trigger evento sensoreCassetta (Feature 004 API)
+        chiosco.sensoreCassetta.notificaChiusura();
       }, 'Chiudi Cassetta');
 
       // FEATURE 003: Event handler "Azzera Saldo - Sì"
@@ -195,6 +195,14 @@
         chiosco.confermaAzzeramento(false);
       }, 'Azzera Saldo - No');
 
+      // Feature 004 (T011): Inizializza GestoreUICassetta usando sensoreCassetta del chiosco
+      const gestoreUICassetta = new GestoreUICassetta(
+        chiosco.sensoreCassetta,
+        document.querySelector('.manutenzione-panel')
+      );
+
+      log.info('✅ Feature 004: GestoreUICassetta inizializzato');
+
       // Esponi istanze globalmente per debugging
       window.app = {
         chiosco,
@@ -203,7 +211,9 @@
         gettoniera,
         lettoreCarte,
         lettoreQR,
-        gestoreTimeout
+        gestoreTimeout,
+        sensoreCassetta: chiosco.sensoreCassetta,  // Feature 004 - usa istanza del chiosco
+        gestoreUICassetta                           // Feature 004
       };
 
       log.info('✅ Event handlers collegati');
