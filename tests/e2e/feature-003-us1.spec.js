@@ -30,8 +30,8 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     // Verifica componenti base caricati
     await expect(page.locator('#display')).toBeVisible();
     await expect(page.locator('#pannello-admin')).toBeVisible();
-    await expect(page.locator('#btn-apri-cassetta')).toBeVisible();
-    await expect(page.locator('#btn-chiudi-cassetta')).toBeVisible();
+    await expect(page.locator('#btn-apri-cassetta-004')).toBeVisible();
+    await expect(page.locator('#btn-chiudi-cassetta-004')).toBeVisible();
     await expect(page.locator('#saldo-cassetta')).toBeVisible();
   });
 
@@ -64,7 +64,7 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     await expect(page.locator('#saldo-cassetta-valore')).toContainText('1,20€');
 
     // === FASE 2: Apertura cassetta → MANUTENZIONE_AUTH_PENDING ===
-    await page.click('#btn-apri-cassetta');
+    await page.click('#btn-apri-cassetta-004');
 
     // Verifica display mostra autenticazione richiesta
     await expect(page.locator('#display-message')).toContainText('Cassetta aperta - Autenticazione richiesta', { timeout: 2000 });
@@ -86,11 +86,11 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     await expect(page.locator('#display-message')).toContainText('Operatore autorizzato (42)', { timeout: 2000 });
     await expect(page.locator('#display-message')).toContainText('Attesa chiusura cassetta');
 
-    // Verifica pulsante "Chiudi Cassetta" ora abilitato
-    await expect(page.locator('#btn-chiudi-cassetta')).toBeEnabled();
+    // Verifica pulsante "Chiudi Cassetta" ora abilitato (sempre abilitato in Feature 004)
+    await expect(page.locator('#btn-chiudi-cassetta-004')).toBeEnabled();
 
     // === FASE 4: Chiusura cassetta → MANUTENZIONE_SCELTA_AZZERAMENTO ===
-    await page.click('#btn-chiudi-cassetta');
+    await page.click('#btn-chiudi-cassetta-004');
 
     // Verifica pulsanti azzeramento visibili
     await page.waitForTimeout(500);
@@ -121,9 +121,9 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     // === FASE 6: Ritorno a IDLE dopo 3s ===
     await expect(page.locator('#display-message')).toContainText('Benvenuto', { timeout: 4000 });
 
-    // Verifica stato IDLE ripristinato
-    await expect(page.locator('#btn-apri-cassetta')).toBeEnabled();
-    await expect(page.locator('#btn-chiudi-cassetta')).toBeEnabled();
+    // Verifica stato IDLE ripristinato (pulsanti Feature 004 sempre abilitati)
+    await expect(page.locator('#btn-apri-cassetta-004')).toBeEnabled();
+    await expect(page.locator('#btn-chiudi-cassetta-004')).toBeEnabled();
 
     // === VERIFICA LOGGING ===
     await page.waitForTimeout(500);
@@ -168,17 +168,17 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     await expect(page.locator('#saldo-cassetta-valore')).toContainText('2,00€');
 
     // === FASE 2-4: Apertura, autenticazione, chiusura ===
-    await page.click('#btn-apri-cassetta');
+    await page.click('#btn-apri-cassetta-004');
     await expect(page.locator('#display-message')).toContainText('Cassetta aperta - Autenticazione richiesta');
 
     await page.fill('#input-carta', '50');
     await page.click('#btn-verifica-carta');
     await expect(page.locator('#display-message')).toContainText('Operatore autorizzato (50)');
 
-    // Verifica pulsante "Chiudi Cassetta" abilitato
-    await expect(page.locator('#btn-chiudi-cassetta')).toBeEnabled();
+    // Verifica pulsante "Chiudi Cassetta" abilitato (sempre abilitato in Feature 004)
+    await expect(page.locator('#btn-chiudi-cassetta-004')).toBeEnabled();
 
-    await page.click('#btn-chiudi-cassetta');
+    await page.click('#btn-chiudi-cassetta-004');
 
     // === FASE 5: Click No → Mantieni saldo ===
     const btnNo = page.locator('#btn-azzera-no');
@@ -216,7 +216,7 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     });
 
     // === FASE 1: Apertura cassetta ===
-    await page.click('#btn-apri-cassetta');
+    await page.click('#btn-apri-cassetta-004');
     await expect(page.locator('#display-message')).toContainText('Cassetta aperta - Autenticazione richiesta');
 
     const countdownTimer = page.locator('#countdown-timer');
@@ -240,9 +240,7 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     const display = page.locator('#display');
     await expect(display).toHaveClass(/errore/);
 
-    // Verifica tutti input disabilitati
-    await expect(page.locator('#btn-apri-cassetta')).toBeDisabled();
-    await expect(page.locator('#btn-chiudi-cassetta')).toBeDisabled();
+    // Verifica input utente disabilitati (pulsanti manutenzione sempre abilitati per Feature 004)
     await expect(page.locator('button[data-valore="1.00"]')).toBeDisabled();
 
     // === FASE 4: Verifica log TIMEOUT e FUORI_SERVIZIO ===
@@ -265,7 +263,7 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
 
     // Verifica ritorno a IDLE
     await expect(page.locator('#display-message')).toContainText('Benvenuto', { timeout: 4000 });
-    await expect(page.locator('#btn-apri-cassetta')).toBeEnabled();
+    await expect(page.locator('#btn-apri-cassetta-004')).toBeEnabled();
 
     // Verifica log RESET
     const logReset = logs.find(l => l.includes('[Manutenzione] RESET') && l.includes('99'));
@@ -277,7 +275,7 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
   // ===== TEST 4: Verifica countdown urgente (classe CSS) =====
 
   test('US1-04: Countdown aggiunge classe "urgente" quando ≤ 3s', async ({ page }) => {
-    await page.click('#btn-apri-cassetta');
+    await page.click('#btn-apri-cassetta-004');
 
     const countdownTimer = page.locator('#countdown-timer');
     await expect(countdownTimer).toBeVisible();
@@ -309,7 +307,7 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
       }
     });
 
-    await page.click('#btn-apri-cassetta');
+    await page.click('#btn-apri-cassetta-004');
     await expect(page.locator('#display-message')).toContainText('Cassetta aperta - Autenticazione richiesta');
 
     const countdownTimer = page.locator('#countdown-timer');
@@ -354,9 +352,7 @@ test.describe('Feature 003 US1: Operazione Svuotamento Base', () => {
     // Pulsante passaggio persona visibile (feature 002)
     await expect(page.locator('#btn-passaggio-persona')).toBeVisible();
 
-    // Pulsanti admin disabilitati in PORTA_APERTA
-    await expect(page.locator('#btn-apri-cassetta')).toBeDisabled();
-    await expect(page.locator('#btn-chiudi-cassetta')).toBeDisabled();
+    // Pulsanti manutenzione sempre abilitati (Feature 004)
 
     console.log('✅ Test US1-06: Regressione feature 001 verificata');
   });

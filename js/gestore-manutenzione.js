@@ -62,7 +62,13 @@ class GestoreManutenzione {
     if (this.countdown) {
       this.countdown.ferma();
       this.countdown = null;
-      log.debug('GestoreManutenzione: countdown fermato');
+
+      // Nascondi countdown dal DOM quando fermato
+      if (this.chiosco?.display) {
+        this.chiosco.display.aggiornaCountdownManutenzione(0);
+      }
+
+      log.debug('GestoreManutenzione: countdown fermato e nascosto');
     }
   }
 

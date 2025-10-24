@@ -316,21 +316,12 @@ class Chiosco {
       if (inputQR) inputQR.disabled = !abilitato;
     }
 
-    // FEATURE 003 (T031): Pulsanti admin manutenzione
-    if (!eccezioni.includes('admin')) {
-      const btnApriCassetta = document.getElementById('btn-apri-cassetta');
-      const btnChiudiCassetta = document.getElementById('btn-chiudi-cassetta');
-      const btnAzzeraSi = document.getElementById('btn-azzera-si');
-      const btnAzzeraNo = document.getElementById('btn-azzera-no');
+    // FEATURE 003 (T031): Pulsanti azzeramento
+    // Pulsanti azzeramento: gestiti da display, non modificare qui
+    // (vengono abilitati solo in MANUTENZIONE_SCELTA_AZZERAMENTO)
 
-      // Abilita/disabilita in base allo stato
-      // Apri/Chiudi cassetta: sempre abilitati in IDLE, disabilitati altrove
-      if (btnApriCassetta) btnApriCassetta.disabled = !abilitato;
-      if (btnChiudiCassetta) btnChiudiCassetta.disabled = !abilitato;
-
-      // Pulsanti azzeramento: gestiti da display, non modificare qui
-      // (vengono abilitati solo in MANUTENZIONE_SCELTA_AZZERAMENTO)
-    }
+    // FEATURE 004: Pulsanti Apri/Chiudi cassetta (btn-apri-cassetta-004, btn-chiudi-cassetta-004)
+    // sono SEMPRE abilitati - simulano eventi hardware, non sono input utente
 
     log.debug(`Input ${abilitato ? 'abilitati' : 'disabilitati'}${eccezioni.length ? ' (eccezioni: ' + eccezioni.join(', ') + ')' : ''}`);
   }

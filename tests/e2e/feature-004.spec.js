@@ -280,9 +280,9 @@ test.describe('Feature 004 - Regressione: Feature 001-003 Funzionanti', () => {
     const saldo = page.locator('#saldo-cassetta-valore');
     await expect(saldo).toBeVisible();
 
-    // Verifica pulsanti admin presenti (feature 003)
-    const btnApriAdmin = page.locator('#btn-apri-cassetta');
-    const btnChiudiAdmin = page.locator('#btn-chiudi-cassetta');
+    // Verifica pulsanti manutenzione presenti (feature 004)
+    const btnApriAdmin = page.locator('#btn-apri-cassetta-004');
+    const btnChiudiAdmin = page.locator('#btn-chiudi-cassetta-004');
     await expect(btnApriAdmin).toBeVisible();
     await expect(btnChiudiAdmin).toBeVisible();
   });

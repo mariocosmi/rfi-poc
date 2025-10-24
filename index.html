@@ -33,32 +33,25 @@
 
             <!-- Area Input (Sinistra) -->
             <div class="input-area">
-                <!-- Pannello Admin Manutenzione (T024) -->
-                <div class="pannello-admin" id="pannello-admin">
-                    <h3>🔧 Manutenzione</h3>
-                    <div class="saldo-cassetta" id="saldo-cassetta">
-                        💰 Saldo cassetta: <span id="saldo-cassetta-valore">0,00€</span>
-                    </div>
-                    <button class="btn-admin" id="btn-apri-cassetta">Apri Cassetta</button>
-                    <button class="btn-admin" id="btn-chiudi-cassetta">Chiudi Cassetta</button>
-                    <div class="countdown-timer hidden" id="countdown-timer"></div>
-                    <div class="pulsanti-azzeramento hidden" id="pulsanti-azzeramento">
-                        <p class="azzeramento-prompt">Azzerare saldo monete?</p>
-                        <button class="btn-azzera-si" id="btn-azzera-si" disabled>Sì</button>
-                        <button class="btn-azzera-no" id="btn-azzera-no" disabled>No</button>
-                    </div>
-                </div>
-
-                <!-- Pannello Manutenzione Cassetta (Feature 004 - T007) -->
-                <div class="manutenzione-panel">
+                <!-- Pannello Manutenzione Cassetta (Feature 004 + Feature 003) -->
+                <div class="manutenzione-panel" id="pannello-admin">
                     <h3>🔧 Manutenzione Cassetta</h3>
                     <div class="stato-cassetta">
                         <span>Stato: </span>
                         <span id="stato-cassetta" class="badge badge-chiusa">CHIUSA</span>
                     </div>
+                    <div class="saldo-cassetta" id="saldo-cassetta">
+                        💰 Saldo: <span id="saldo-cassetta-valore">0,00€</span>
+                    </div>
                     <div class="controlli-cassetta">
                         <button id="btn-apri-cassetta-004" class="btn-manutenzione">Apri Cassetta</button>
                         <button id="btn-chiudi-cassetta-004" class="btn-manutenzione">Chiudi Cassetta</button>
+                    </div>
+                    <div class="countdown-timer hidden" id="countdown-timer"></div>
+                    <div class="pulsanti-azzeramento hidden" id="pulsanti-azzeramento">
+                        <p class="azzeramento-prompt">Azzerare saldo monete?</p>
+                        <button class="btn-azzera-si" id="btn-azzera-si" disabled>Sì</button>
+                        <button class="btn-azzera-no" id="btn-azzera-no" disabled>No</button>
                     </div>
                 </div>
 
