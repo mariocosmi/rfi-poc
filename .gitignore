@@ -39,3 +39,6 @@ node_modules/
 playwright-report/
 test-results/
 playwright/.cache/
+
+# Local Netlify folder
+.netlify

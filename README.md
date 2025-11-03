@@ -1,6 +1,14 @@
 # RFI PoC - Simulatore Chiosco Ingresso Ferroviario
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/df75ca80-8ad7-4527-b16d-2a3ea39c0d7a/deploy-status)](https://app.netlify.com/sites/rfi-poc-chiosco/deploys)
+
 Proof of Concept di un chiosco ingresso ferroviario basato su web. Gli utenti possono accedere pagando 1,20€ tramite monete o carta di credito, oppure mostrando codici autorizzati (QR o carta contactless).
+
+## 🌐 Demo Live
+
+**[🚀 Prova il simulatore](https://rfi-poc-chiosco.netlify.app)**
+
+Il sito è hostato su Netlify con deploy automatici ad ogni push su master.
 
 ## 🚀 Caratteristiche
 
@@ -186,8 +194,10 @@ Questo progetto è un Proof of Concept per scopi didattici e di ricerca.
 
 ## 🔗 Link Utili
 
+- **Demo Live**: https://rfi-poc-chiosco.netlify.app
 - **Repository**: https://github.com/mariocosmi/rfi-poc
 - **Issues**: https://github.com/mariocosmi/rfi-poc/issues
+- **Netlify Dashboard**: https://app.netlify.com/sites/rfi-poc-chiosco
 - **Playwright Docs**: https://playwright.dev
 
 ---
