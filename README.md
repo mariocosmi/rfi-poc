@@ -204,3 +204,4 @@ Questo progetto è un Proof of Concept per scopi didattici e di ricerca.
 
 **Versione**: 1.4.0 (Feature 004 completata)
 **Ultimo aggiornamento**: Novembre 2025
+**Deploy**: Automatico su Netlify
