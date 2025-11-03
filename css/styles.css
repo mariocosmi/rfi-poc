@@ -93,3 +93,14 @@ body {
   pointer-events: none;
   cursor: not-allowed;
 }
+
+/* Deploy Footer */
+.deploy-footer {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e0e0e0;
+  text-align: center;
+  font-size: 0.7rem;
+  color: #999;
+  font-family: 'Courier New', monospace;
+}

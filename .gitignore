@@ -42,3 +42,6 @@ playwright/.cache/
 
 # Local Netlify folder
 .netlify
+
+# Build-generated files
+js/build-info.js

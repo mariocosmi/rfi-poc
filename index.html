@@ -114,10 +114,18 @@
                 </div>
             </div>
         </div>
+
+        <!-- Footer Deploy Info -->
+        <footer class="deploy-footer" id="deploy-footer">
+            <span id="deploy-info">Loading deploy info...</span>
+        </footer>
     </div>
 
     <!-- JavaScript Libraries -->
     <script src="assets/lib/loglevel.min.js"></script>
+
+    <!-- Build Info (generato durante deploy) -->
+    <script src="js/build-info.js"></script>
 
     <!-- JavaScript Modules -->
     <script src="js/logger.js"></script>
@@ -134,5 +142,17 @@
     <script src="js/gestore-manutenzione.js"></script>
     <script src="js/gestore-ui-cassetta.js"></script>
     <script src="js/app.js"></script>
+
+    <!-- Script per mostrare deploy info nel footer -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deployInfoEl = document.getElementById('deploy-info');
+            if (window.BUILD_INFO) {
+                deployInfoEl.textContent = `Branch: ${window.BUILD_INFO.branch} | Commit: ${window.BUILD_INFO.commit} | Deploy: ${window.BUILD_INFO.deployDate}`;
+            } else {
+                deployInfoEl.textContent = 'Deploy info non disponibile';
+            }
+        });
+    </script>
 </body>
 </html>
