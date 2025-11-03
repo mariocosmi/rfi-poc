@@ -33,6 +33,19 @@ body {
   text-align: center;
   margin-bottom: 15px;
   color: #333;
+  position: relative;
+}
+
+.chiosco-header .header-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.chiosco-header .header-text {
+  flex: 1;
+  text-align: center;
 }
 
 .chiosco-header h1 {
@@ -45,6 +58,36 @@ body {
 .chiosco-header p {
   font-size: 0.95rem;
   color: #666;
+}
+
+.btn-help {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-help:hover {
+  transform: translateY(-50%) translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+}
+
+.btn-help:active {
+  transform: translateY(-50%) translateY(0);
+  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
 }
 
 .chiosco-layout {
@@ -80,6 +123,24 @@ body {
 
   .porta-area {
     grid-column: 1;
+  }
+
+  .btn-help {
+    position: relative;
+    transform: none;
+    margin-top: 10px;
+  }
+
+  .btn-help:hover {
+    transform: translateY(-2px);
+  }
+
+  .chiosco-header .header-content {
+    flex-direction: column;
+  }
+
+  .chiosco-header .header-text {
+    margin-bottom: 10px;
   }
 }
 

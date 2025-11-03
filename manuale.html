@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manuale d'Uso - Simulatore Chiosco Ingresso</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .manual-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .manual-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .manual-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .manual-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .manual-content {
+            padding: 40px;
+        }
+
+        .back-button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 30px;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .back-button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 1.8rem;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.3rem;
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+
+        p, li {
+            margin-bottom: 12px;
+        }
+
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .toc h2 {
+            margin-top: 0;
+            border: none;
+            padding: 0;
+        }
+
+        .toc ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .toc li {
+            margin-bottom: 8px;
+        }
+
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .manual-footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="manual-container">
+        <div class="manual-header">
+            <h1>📖 Manuale d'Uso</h1>
+            <p>Simulatore Chiosco Ingresso Ferroviario</p>
+        </div>
+
+        <div class="manual-content">
+            <a href="index.html" class="back-button">← Torna al Simulatore</a>
+
+            <div class="toc">
+                <h2>Indice</h2>
+                <ul>
+                    <li><a href="#panoramica">1. Panoramica</a></li>
+                    <li><a href="#requisiti">2. Requisiti di Sistema</a></li>
+                    <li><a href="#avvio">3. Avvio dell'Applicazione</a></li>
+                    <li><a href="#regole">4. Regole di Validazione</a></li>
+                    <li><a href="#utilizzo">5. Come Utilizzare il Simulatore</a></li>
+                    <li><a href="#scenari">6. Scenari d'Uso</a></li>
+                    <li><a href="#manutenzione">7. Funzioni di Manutenzione</a></li>
+                    <li><a href="#debugging">8. Debugging e Console</a></li>
+                    <li><a href="#troubleshooting">9. Risoluzione Problemi</a></li>
+                </ul>
+            </div>
+
+            <h2 id="panoramica">1. Panoramica</h2>
+            <p>
+                Il <strong>Simulatore Chiosco Ingresso</strong> è un'applicazione web che replica il funzionamento di un chiosco automatico
+                per il controllo accessi ferroviari. Gli utenti possono accedere pagando 1,20€ tramite monete o carta di credito,
+                oppure mostrando codici autorizzati (QR code o carta contactless).
+            </p>
+
+            <div class="info-box">
+                <strong>💡 Caratteristiche principali:</strong>
+                <ul>
+                    <li>✅ Simulazione completa di hardware (gettoniera, lettori, porta)</li>
+                    <li>✅ 4 metodi di accesso: monete, carta di credito, QR code, carta autorizzata</li>
+                    <li>✅ Display interattivo con messaggi e countdown</li>
+                    <li>✅ Apertura/chiusura porta automatica</li>
+                    <li>✅ Pannello manutenzione per operatori</li>
+                    <li>✅ Logging completo su console browser</li>
+                </ul>
+            </div>
+
+            <h2 id="requisiti">2. Requisiti di Sistema</h2>
+            <table>
+                <tr>
+                    <th>Requisito</th>
+                    <th>Specifiche</th>
+                </tr>
+                <tr>
+                    <td><strong>Browser</strong></td>
+                    <td>Chrome 90+, Firefox 88+, Safari 14+, Edge 90+ (ultime 2 versioni)</td>
+                </tr>
+                <tr>
+                    <td><strong>Risoluzione Schermo</strong></td>
+                    <td>Minimo 1024x768 pixel (consigliato Full HD 1920x1080)</td>
+                </tr>
+                <tr>
+                    <td><strong>JavaScript</strong></td>
+                    <td>Abilitato (richiesto per tutte le funzionalità)</td>
+                </tr>
+                <tr>
+                    <td><strong>Connessione Internet</strong></td>
+                    <td>Non richiesta (applicazione completamente client-side)</td>
+                </tr>
+            </table>
+
+            <div class="warning-box">
+                <strong>⚠️ Nota:</strong> Internet Explorer 11 e versioni precedenti NON sono supportati.
+            </div>
+
+            <h2 id="avvio">3. Avvio dell'Applicazione</h2>
+
+            <h3>Opzione 1: Apertura Diretta</h3>
+            <p>
+                Naviga alla directory del progetto e apri <code>index.html</code> nel browser:
+            </p>
+            <ul>
+                <li><strong>Windows:</strong> Doppio click su <code>index.html</code></li>
+                <li><strong>macOS:</strong> Doppio click o <code>open index.html</code> da terminale</li>
+                <li><strong>Linux:</strong> <code>xdg-open index.html</code> o doppio click</li>
+            </ul>
+
+            <h3>Opzione 2: Server HTTP Locale (Raccomandato)</h3>
+            <pre><code># Python (se installato)
+python3 -m http.server 8000
+
+# Node.js (se installato)
+npx http-server -p 8000
+
+# PHP (se installato)
+php -S localhost:8000</code></pre>
+            <p>Poi apri browser all'indirizzo: <code>http://localhost:8000</code></p>
+
+            <h2 id="regole">4. Regole di Validazione</h2>
+            <p>
+                Il simulatore utilizza regole <strong>hardcoded</strong> per validare accessi.
+                Nessuna configurazione necessaria.
+            </p>
+
+            <h3>4.1 Codici QR/Carte Autorizzate</h3>
+            <div class="success-box">
+                <strong>Regola:</strong> Accetta qualsiasi numero da <strong>1 a 99</strong>
+            </div>
+            <table>
+                <tr>
+                    <th>Codice</th>
+                    <th>Valido</th>
+                    <th>Motivo</th>
+                </tr>
+                <tr>
+                    <td><code>"1"</code></td>
+                    <td><span class="badge badge-success">✅ Valido</span></td>
+                    <td>Range 1-99</td>
+                </tr>
+                <tr>
+                    <td><code>"42"</code></td>
+                    <td><span class="badge badge-success">✅ Valido</span></td>
+                    <td>Range 1-99</td>
+                </tr>
+                <tr>
+                    <td><code>"99"</code></td>
+                    <td><span class="badge badge-success">✅ Valido</span></td>
+                    <td>Range 1-99</td>
+                </tr>
+                <tr>
+                    <td><code>"0"</code></td>
+                    <td><span class="badge badge-error">❌ Non valido</span></td>
+                    <td>Fuori range</td>
+                </tr>
+                <tr>
+                    <td><code>"100"</code></td>
+                    <td><span class="badge badge-error">❌ Non valido</span></td>
+                    <td>Fuori range</td>
+                </tr>
+                <tr>
+                    <td><code>"ABC"</code></td>
+                    <td><span class="badge badge-error">❌ Non valido</span></td>
+                    <td>Non numerico</td>
+                </tr>
+            </table>
+
+            <h3>4.2 Carte di Credito per Pagamenti</h3>
+            <div class="success-box">
+                <strong>Regola:</strong> Accetta solo carte <strong>VISA</strong> (numero inizia con "4")
+            </div>
+            <table>
+                <tr>
+                    <th>Numero Carta</th>
+                    <th>Valido</th>
+                    <th>Tipo</th>
+                </tr>
+                <tr>
+                    <td><code>"4111111111111111"</code></td>
+                    <td><span class="badge badge-success">✅ Valido</span></td>
+                    <td>VISA (test card)</td>
+                </tr>
+                <tr>
+                    <td><code>"4012888888881881"</code></td>
+                    <td><span class="badge badge-success">✅ Valido</span></td>
+                    <td>VISA</td>
+                </tr>
+                <tr>
+                    <td><code>"5500000000000004"</code></td>
+                    <td><span class="badge badge-error">❌ Non valido</span></td>
+                    <td>Mastercard (inizia con 5)</td>
+                </tr>
+                <tr>
+                    <td><code>"340000000000009"</code></td>
+                    <td><span class="badge badge-error">❌ Non valido</span></td>
+                    <td>Amex (inizia con 3)</td>
+                </tr>
+            </table>
+
+            <h2 id="utilizzo">5. Come Utilizzare il Simulatore</h2>
+
+            <h3>5.1 Schermata Iniziale</h3>
+            <p>All'avvio vedrai:</p>
+            <ul>
+                <li><strong>Display</strong> centrale con messaggio "Benvenuto - Scegli modalità di accesso"</li>
+                <li><strong>Gettoniera</strong> con pulsanti monete (1€, 0,50€, 0,20€, 0,10€, 0,05€, 0,02€, 0,01€)</li>
+                <li><strong>Lettore Carte</strong> con pulsanti "Paga con Carta" e "Verifica Carta Autorizzata"</li>
+                <li><strong>Lettore QR</strong> con campo input e pulsante "Scansiona QR"</li>
+                <li><strong>Porta</strong> visualizzata come chiusa</li>
+                <li><strong>Pannello Manutenzione</strong> (in basso) per operatori</li>
+            </ul>
+
+            <h2 id="scenari">6. Scenari d'Uso</h2>
+
+            <h3>6.1 Scenario 1: Pagamento con Monete</h3>
+            <div class="info-box">
+                <strong>Obiettivo:</strong> Versare 1,20€ con monete per aprire la porta.
+            </div>
+            <ol>
+                <li><strong>Click su pulsante moneta</strong> (es. 0,50€)
+                    <ul>
+                        <li>Display aggiorna: <code>"Rimanente: 0,70 €"</code></li>
+                        <li>Timer timeout 20s si avvia (countdown visibile)</li>
+                    </ul>
+                </li>
+                <li><strong>Continua inserimento monete</strong> fino a raggiungere 1,20€
+                    <ul>
+                        <li>Es. 0,50€ → 0,50€ → 0,20€</li>
+                        <li>Display aggiorna progressivamente: <code>0,70 €</code> → <code>0,20 €</code> → <code>0,00 €</code></li>
+                    </ul>
+                </li>
+                <li><strong>Porta si apre automaticamente</strong>
+                    <ul>
+                        <li>Display mostra: <code>"Accesso consentito - Porta aperta"</code></li>
+                        <li>Animazione apertura porta (scorrimento verso l'alto)</li>
+                        <li>Timer chiusura automatica 15s attivo</li>
+                    </ul>
+                </li>
+                <li><strong>Porta si chiude dopo 15s o click "Persona passata"</strong>
+                    <ul>
+                        <li>Porta torna in posizione chiusa</li>
+                        <li>Sistema ritorna a stato iniziale automaticamente</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <div class="warning-box">
+                <strong>Note importanti:</strong>
+                <ul>
+                    <li>Sovrapagamento permesso (es. inserire 1,50€ apre la porta, nessun resto)</li>
+                    <li>Se dopo 20s di inattività il pagamento non è completato, sistema resetta automaticamente</li>
+                    <li>Durante pagamento monete, è possibile passare a "Paga con Carta" (azzera monete inserite)</li>
+                </ul>
+            </div>
+
+            <h3>6.2 Scenario 2: Pagamento con Carta di Credito</h3>
+            <div class="info-box">
+                <strong>Obiettivo:</strong> Pagare 1,20€ con carta di credito contactless.
+            </div>
+            <ol>
+                <li><strong>Click su "Paga con Carta"</strong>
+                    <ul>
+                        <li>Display mostra: <code>"Avvicina la carta al lettore"</code></li>
+                        <li>Altri metodi di input disabilitati (pulsanti grigi)</li>
+                    </ul>
+                </li>
+                <li><strong>Click su area lettore carte</strong> (simula avvicinamento carta)
+                    <ul>
+                        <li>Display mostra: <code>"Elaborazione..."</code></li>
+                        <li>Simulazione delay 1-2 secondi</li>
+                    </ul>
+                </li>
+                <li><strong>Esito transazione</strong> (randomizzato 80% successo):
+                    <ul>
+                        <li><strong>Successo:</strong> Display <code>"Pagamento accettato"</code> → Porta si apre</li>
+                        <li><strong>Fallimento:</strong> Display <code>"Pagamento rifiutato - Riprova"</code> → Torna a stato iniziale</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h3>6.3 Scenario 3: Accesso con QR Code Autorizzato</h3>
+            <div class="info-box">
+                <strong>Obiettivo:</strong> Mostrare QR code autorizzato per accesso senza pagamento.
+            </div>
+            <ol>
+                <li><strong>Digita codice numerico nel campo QR</strong> (es. "42")
+                    <ul>
+                        <li>Usa qualsiasi numero da 1 a 99</li>
+                    </ul>
+                </li>
+                <li><strong>Click "Scansiona QR"</strong>
+                    <ul>
+                        <li>Sistema valida codice contro regola hardcoded (1-99)</li>
+                        <li>Altri input disabilitati durante verifica</li>
+                    </ul>
+                </li>
+                <li><strong>Esito verifica:</strong>
+                    <ul>
+                        <li><strong>Autorizzato</strong> (1-99): Display <code>"Accesso autorizzato"</code> → Porta si apre immediatamente</li>
+                        <li><strong>Non autorizzato</strong> (fuori range): Display <code>"Accesso negato"</code> → Torna a stato iniziale</li>
+                        <li><strong>Errore:</strong> Display <code>"Errore lettura QR"</code> (se non numerico o malformato)</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <h3>6.4 Scenario 4: Accesso con Carta Contactless Autorizzata</h3>
+            <div class="info-box">
+                <strong>Obiettivo:</strong> Verificare carta contactless autorizzata per accesso senza pagamento.
+            </div>
+            <ol>
+                <li><strong>Click "Verifica Carta Autorizzata"</strong></li>
+                <li><strong>Inserisci codice numerico</strong> (es. "42") e <strong>Click "Verifica"</strong></li>
+                <li><strong>Esito verifica:</strong> Stessa logica validazione QR code (numeri 1-99)</li>
+            </ol>
+
+            <h2 id="manutenzione">7. Funzioni di Manutenzione</h2>
+            <p>
+                Il pannello manutenzione (in basso nella pagina) fornisce controlli per operatori autorizzati.
+            </p>
+
+            <h3>7.1 Stato Cassetta</h3>
+            <ul>
+                <li><strong>Badge Stato:</strong> Visualizza stato cassetta corrente
+                    <ul>
+                        <li>🟢 <strong>APERTA</strong> (badge verde)</li>
+                        <li>⚪ <strong>CHIUSA</strong> (badge grigio)</li>
+                    </ul>
+                </li>
+                <li><strong>Pulsanti Controllo:</strong>
+                    <ul>
+                        <li><strong>"Apri Cassetta":</strong> Simula apertura cassetta (sempre abilitato)</li>
+                        <li><strong>"Chiudi Cassetta":</strong> Simula chiusura cassetta (sempre abilitato)</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <div class="info-box">
+                <strong>💡 Nota:</strong> La cassetta è <strong>indipendente</strong> dalla porta del chiosco.
+                Aprire la cassetta non influenza il funzionamento della porta o i pagamenti.
+            </div>
+
+            <h3>7.2 Saldo Cassetta</h3>
+            <ul>
+                <li>Visualizza importo totale raccolto dalla cassetta</li>
+                <li>Operazione "Svuota Cassetta" disponibile (con conferma e timer countdown)</li>
+            </ul>
+
+            <h3>7.3 Pulsante "Persona Passata"</h3>
+            <ul>
+                <li>Appare quando la porta è aperta</li>
+                <li>Click immediato chiude la porta (cancella timer 15s automatico)</li>
+                <li>Utile per simulare passaggio persona attraverso porta</li>
+            </ul>
+
+            <h2 id="debugging">8. Debugging e Console</h2>
+            <p>
+                Il simulatore utilizza <code>loglevel</code> per logging completo su console browser.
+            </p>
+
+            <h3>8.1 Aprire Console</h3>
+            <ul>
+                <li><strong>Chrome/Edge:</strong> Premi <code>F12</code> → tab <strong>Console</strong></li>
+                <li><strong>Firefox:</strong> Premi <code>F12</code> → tab <strong>Console</strong></li>
+                <li><strong>Safari:</strong> Premi <code>Cmd+Option+C</code></li>
+            </ul>
+
+            <h3>8.2 Livelli di Log</h3>
+            <p>Default: <code>INFO</code> (mostra info, warn, error)</p>
+            <pre><code>// Cambiare livello log nella console
+log.setLevel('debug'); // Mostra tutto (debug, info, warn, error)
+log.setLevel('warn');  // Solo warning e errori
+log.setLevel('error'); // Solo errori
+
+// Il livello persiste in LocalStorage automaticamente</code></pre>
+
+            <h3>8.3 Comandi Console Utili</h3>
+            <pre><code>// Reset completo simulatore
+chiosco.reset();
+
+// Verifica stato corrente
+chiosco.stato
+
+// Test validazione rapida
+Validatore.isCodiceAutorizzato('42');           // true
+Validatore.isCartaVISA('4111111111111111');     // true
+
+// Verifica stato cassetta
+window.app.sensoreCassetta.getStato(); // 'APERTA' | 'CHIUSA'
+
+// Verifica saldo cassetta
+window.app.gettoniera.getSaldo();  // Importo totale raccolto</code></pre>
+
+            <h2 id="troubleshooting">9. Risoluzione Problemi</h2>
+
+            <h3>9.1 Carta di credito sempre rifiutata</h3>
+            <div class="warning-box">
+                <strong>Causa:</strong> Carta non VISA (non inizia con "4")
+                <br><br>
+                <strong>Soluzione:</strong> Usa solo carte VISA. Esempi validi:
+                <ul>
+                    <li><code>"4111111111111111"</code> ✅</li>
+                    <li><code>"4012888888881881"</code> ✅</li>
+                </ul>
+            </div>
+
+            <h3>9.2 Porta non si apre dopo pagamento</h3>
+            <div class="warning-box">
+                <strong>Debug:</strong>
+                <ol>
+                    <li>Apri console browser (F12)</li>
+                    <li>Verifica log per errori</li>
+                    <li>Controlla stato: <code>chiosco.stato</code></li>
+                    <li>Verifica importo: <code>chiosco.gettoniera.getImportoRimanente()</code> deve essere <code>0</code></li>
+                </ol>
+                <strong>Soluzione:</strong> Ricarica pagina (<code>F5</code>)
+            </div>
+
+            <h3>9.3 QR code sempre "Accesso negato"</h3>
+            <div class="warning-box">
+                <strong>Causa:</strong> Codice fuori range 1-99 o non numerico
+                <br><br>
+                <strong>Soluzione:</strong> Verifica codice sia numero tra 1 e 99:
+                <ul>
+                    <li>Esempi validi: <code>"1"</code>, <code>"42"</code>, <code>"99"</code> ✅</li>
+                    <li>Esempi non validi: <code>"0"</code>, <code>"100"</code>, <code>"ABC"</code> ❌</li>
+                </ul>
+            </div>
+
+            <h3>9.4 Timeout troppo veloce/lento</h3>
+            <div class="info-box">
+                <strong>Personalizzazione temporanea (reset al reload):</strong>
+                <pre><code>// Console browser - modifica durata timeout (in secondi)
+chiosco.gestoreTimeout.durata = 30000; // 30 secondi invece di 20</code></pre>
+            </div>
+
+            <h3>9.5 Browser non supportato</h3>
+            <div class="warning-box">
+                <strong>Verifica Compatibilità:</strong>
+                <ul>
+                    <li>Chrome 90+ ✅</li>
+                    <li>Firefox 88+ ✅</li>
+                    <li>Safari 14+ ✅</li>
+                    <li>Edge 90+ ✅</li>
+                    <li>IE11 ❌ (non supportato)</li>
+                </ul>
+                <strong>Soluzione:</strong> Scarica ultima versione browser dal sito ufficiale
+            </div>
+
+            <div class="success-box">
+                <strong>✅ Hai ancora domande?</strong> Apri la console browser (F12) e verifica i log.
+                Tutti gli eventi e le transizioni di stato sono registrati in tempo reale.
+            </div>
+        </div>
+
+        <div class="manual-footer">
+            <p><strong>Simulatore Chiosco Ingresso</strong> - Versione 1.0</p>
+            <p>Ultima modifica: 2025-11-03</p>
+            <p><a href="index.html" style="color: #667eea; font-weight: 600;">← Torna al Simulatore</a></p>
+        </div>
+    </div>
+</body>
+</html>
