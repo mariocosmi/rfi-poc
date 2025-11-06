@@ -72,26 +72,24 @@ ios-app/ChioscoApp/
 - **macOS Ventura 13+** (o superiore)
 - **iOS 17+** (target deployment)
 
-### Setup
+### Setup Rapido (RACCOMANDATO)
 
-1. **Apri il progetto in Xcode**:
-   ```bash
-   cd ios-app/ChioscoApp
-   open ChioscoApp.xcodeproj  # (se hai un progetto Xcode configurato)
-   ```
+```bash
+cd ios-app
+./setup.sh
+```
 
-2. **Oppure crea un nuovo progetto Xcode**:
-   - Apri Xcode
-   - File → New → Project
-   - Seleziona "iOS" → "App"
-   - Nome: `ChioscoApp`
-   - Interface: **SwiftUI**
-   - Language: **Swift**
-   - Copia tutti i file `.swift` nelle rispettive cartelle del progetto
+Lo script configura tutto automaticamente e apre il progetto in Xcode.
 
-3. **Esegui l'app**:
-   - Seleziona un simulatore iOS (es. iPhone 15 Pro)
-   - Premi `Cmd + R` per eseguire
+### Setup Manuale
+
+Vedi la **[Guida Completa SETUP.md](SETUP.md)** per istruzioni dettagliate su:
+- ✅ Setup automatico con script
+- ✅ Setup manuale in Xcode
+- ✅ Esecuzione su dispositivo fisico
+- ✅ Risoluzione problemi comuni
+
+**Guida Rapida**: Vedi **[QUICKSTART.md](QUICKSTART.md)** per test immediati
 
 ### Debugging
 

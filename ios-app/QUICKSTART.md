@@ -1,226 +1,122 @@
 # Quickstart - ChioscoApp iOS
 
-Guida rapida per configurare e eseguire l'app iOS del chiosco.
+Guida rapida per eseguire l'app iOS del chiosco in 2 minuti.
 
-## 🚀 Opzione 1: Crea Progetto Xcode Manualmente
+---
 
-### Passo 1: Crea nuovo progetto Xcode
+## ⚡ Setup Veloce
 
-1. Apri **Xcode**
-2. File → New → Project
-3. Seleziona:
-   - **iOS** → **App**
-   - Product Name: `ChioscoApp`
-   - Interface: **SwiftUI**
-   - Language: **Swift**
-   - Organization Identifier: `it.rfi` (o tuo)
-4. Salva in una cartella temporanea
-
-### Passo 2: Copia i file sorgente
-
-1. **Elimina** il file `ContentView.swift` creato automaticamente da Xcode
-2. **Copia** tutti i file dalla directory `ChioscoApp/` di questo repository nel progetto Xcode:
+### Opzione A: Setup Automatico (30 secondi)
 
 ```bash
-# Dalla directory ios-app/
-cp -r ChioscoApp/Core/*.swift [TuoProgettoXcode]/ChioscoApp/
-cp -r ChioscoApp/Models/*.swift [TuoProgettoXcode]/ChioscoApp/
-cp -r ChioscoApp/Views/*.swift [TuoProgettoXcode]/ChioscoApp/
-cp ChioscoApp/ChioscoApp.swift [TuoProgettoXcode]/ChioscoApp/
+cd ios-app
+./setup.sh
 ```
 
-3. In Xcode, aggiungi i file al progetto:
-   - Tasto destro sul gruppo `ChioscoApp` → Add Files to "ChioscoApp"
-   - Seleziona tutti i file `.swift` copiati
-   - Assicurati che "Copy items if needed" sia **deselezionato** (file già copiati)
+✅ Lo script installa tutto, genera il progetto e apre Xcode.
 
-### Passo 3: Organizza i file in gruppi
+### Opzione B: Setup Manuale
 
-Nel navigator di Xcode, crea questa struttura:
-
-```
-ChioscoApp/
-├── ChioscoApp.swift
-├── Core/
-│   ├── ChioscoStato.swift
-│   ├── Chiosco.swift
-│   ├── GestoreTimeout.swift
-│   ├── Logger.swift
-│   └── Validatore.swift
-├── Models/
-│   ├── Display.swift
-│   ├── Porta.swift
-│   └── Gettoniera.swift
-└── Views/
-    ├── ContentView.swift
-    ├── DisplayView.swift
-    ├── PortaView.swift
-    ├── GettonierapView.swift
-    ├── PagamentoCartaView.swift
-    ├── LettoreCarteView.swift
-    └── LettoreQRView.swift
-```
-
-### Passo 4: Configura target iOS
-
-1. Seleziona il **target ChioscoApp**
-2. General → Deployment Info:
-   - **iOS Deployment Target**: 17.0 (o superiore)
-   - **Supported Destinations**: iPhone, iPad
-   - **Orientation**: Portrait, Landscape
-
-### Passo 5: Esegui l'app
-
-1. Seleziona un simulatore (es. iPhone 15 Pro)
-2. Premi **⌘ + R** (o Product → Run)
-3. L'app dovrebbe compilare e avviarsi nel simulatore
+Vedi **[SETUP.md](SETUP.md)** per istruzioni complete passo-passo.
 
 ---
 
-## 🚀 Opzione 2: Usa Swift Package (Avanzato)
+## 🧪 Test Rapidi
 
-### Crea Package.swift
+Dopo aver avviato l'app nel simulatore, testa queste funzionalità:
 
-Se preferisci usare Swift Package Manager invece di Xcode:
-
-```bash
-cd ios-app/ChioscoApp
-swift package init --type executable
+### ✅ Test 1: Pagamento Monete (15 sec)
 ```
-
-Modifica `Package.swift`:
-
-```swift
-// swift-tools-version: 5.9
-import PackageDescription
-
-let package = Package(
-    name: "ChioscoApp",
-    platforms: [
-        .iOS(.v17)
-    ],
-    products: [
-        .library(name: "ChioscoApp", targets: ["ChioscoApp"])
-    ],
-    targets: [
-        .target(
-            name: "ChioscoApp",
-            path: "."
-        )
-    ]
-)
+1. Tap "1,00€" → Display: "Rimanente: 0,20 €"
+2. Tap "0,20€" → Porta si apre 🚪
+3. Tap "Persona passata" → Porta si chiude
 ```
+**Risultato atteso**: Porta aperta e chiusa ✅
 
-**Nota**: Swift Package non supporta nativamente app iOS con UI - questa opzione è solo per compilare la logica di business.
-
----
-
-## 🧪 Test Rapido
-
-Dopo aver eseguito l'app, prova questi scenari:
-
-### Test 1: Pagamento Monete
-1. Tap "1,00€" (Display mostra "Rimanente: 0,20 €")
-2. Tap "0,20€" (Porta si apre)
-3. Tap "Persona passata" (Porta si chiude)
-
-### Test 2: Carta VISA
+### ✅ Test 2: Carta VISA (10 sec)
+```
 1. Tap "Paga con Carta"
-2. Inserisci "4111111111111111"
+2. Inserisci: 4111111111111111
 3. Tap "Conferma Pagamento"
-4. Porta si apre ✅
+```
+**Risultato atteso**: "Pagamento accettato" + Porta aperta ✅
 
-### Test 3: Carta Non VISA
+### ✅ Test 3: Carta Non-VISA (10 sec)
+```
 1. Tap "Paga con Carta"
-2. Inserisci "5500000000000004"
+2. Inserisci: 5500000000000004
 3. Tap "Conferma Pagamento"
-4. Display mostra "Pagamento rifiutato" ❌
+```
+**Risultato atteso**: "Pagamento rifiutato - Solo VISA" ❌
 
-### Test 4: QR Autorizzato
-1. Inserisci "42" in "Lettore QR"
+### ✅ Test 4: QR Autorizzato (5 sec)
+```
+1. Inserisci "42" in Lettore QR
 2. Tap "Scansiona"
-3. Porta si apre ✅
+```
+**Risultato atteso**: "Accesso autorizzato" + Porta aperta ✅
 
-### Test 5: QR Non Autorizzato
-1. Inserisci "100" in "Lettore QR"
+### ✅ Test 5: QR Non Autorizzato (5 sec)
+```
+1. Inserisci "100" in Lettore QR
 2. Tap "Scansiona"
-3. Display mostra "Accesso negato" ❌
+```
+**Risultato atteso**: "Accesso negato" ❌
+
+### ✅ Test 6: Timeout Inattività (20 sec)
+```
+1. Tap "0,50€"
+2. NON fare altro per 20 secondi
+3. Osserva countdown: "⏱️ Timeout: 19s... 18s..."
+```
+**Risultato atteso**: "Timeout - Operazione annullata" ⏱️
 
 ---
 
-## 🐛 Risoluzione Problemi
+## 🐛 Problemi Comuni (Fix Rapidi)
 
-### Errore: "Cannot find type 'ChioscoStato' in scope"
+### Errore: "Cannot find type 'ChioscoStato'"
+**Fix**: File non nel target → Seleziona file, spunta "ChioscoApp" in Target Membership
 
-**Causa**: File non aggiunti correttamente al target
-
-**Soluzione**:
-1. Seleziona ogni file `.swift` nel navigator
-2. Nel pannello di destra, sotto "Target Membership", assicurati che `ChioscoApp` sia **spuntato**
-
-### Errore: "Multiple commands produce..."
-
-**Causa**: File duplicati nel target
-
-**Soluzione**:
-1. Vai su Build Phases → Compile Sources
-2. Rimuovi duplicati (ogni file deve apparire una sola volta)
+### Errore: "Signing requires a development team"
+**Fix**: Signing & Capabilities → Seleziona tuo Team Apple
 
 ### App compila ma schermo bianco
+**Fix**: Product → Clean Build Folder (⇧⌘K) + Ricompila (⌘B)
 
-**Causa**: ContentView non caricata correttamente
+### Script setup.sh non funziona
+**Fix**: Installa XcodeGen: `brew install xcodegen`
 
-**Soluzione**:
-1. Verifica che `ChioscoApp.swift` contenga:
-   ```swift
-   @main
-   struct ChioscoApp: App {
-       @StateObject private var chiosco = Chiosco()
-
-       var body: some Scene {
-           WindowGroup {
-               ContentView()
-                   .environmentObject(chiosco)
-           }
-       }
-   }
-   ```
-
-### Timer non funzionano
-
-**Causa**: SwiftUI richiede aggiornamenti su main thread
-
-**Soluzione**: Già gestito nel codice con `DispatchQueue.main.asyncAfter`
+**Più dettagli**: Vedi [SETUP.md](SETUP.md) per risoluzione problemi completa
 
 ---
 
-## 📚 Risorse
+## 📚 Documentazione Completa
 
-- **Apple Documentation**: [SwiftUI Tutorials](https://developer.apple.com/tutorials/swiftui)
-- **Xcode Help**: Help → Xcode Help
-- **README.md**: Documentazione completa dell'architettura
+- **[README.md](README.md)** - Architettura, struttura progetto, debugging
+- **[SETUP.md](SETUP.md)** - Guida setup dettagliata (manuale + automatico)
 
 ---
 
-## ✅ Checklist Pre-Lancio
+## ✅ Checklist Pre-Test
 
-Prima di eseguire l'app, assicurati che:
+- [ ] Xcode 15+ installato
+- [ ] Progetto aperto in Xcode (`./setup.sh` o manuale)
+- [ ] Simulatore iPhone/iPad selezionato
+- [ ] App compilata senza errori (⌘ + B)
+- [ ] App in esecuzione nel simulatore (⌘ + R)
 
-- [x] Tutti i file `.swift` siano nel progetto Xcode
-- [x] Target membership corretto per ogni file
-- [x] iOS Deployment Target = 17.0+
-- [x] Simulatore selezionato (iPhone o iPad)
-- [x] Nessun errore di compilazione (⌘ + B)
+**Se tutto ok**: Procedi con i test sopra! 🎉
 
 ---
 
 ## 🎯 Next Steps
 
-Dopo aver eseguito l'app con successo:
+Dopo aver testato l'app:
 
-1. Esplora il codice in `Core/Chiosco.swift` (FSM principale)
-2. Modifica i colori in `Views/*.swift` per personalizzare l'UI
-3. Aggiungi logging con `Logger.debug("...")` per debugging
-4. Testa tutti gli scenari di pagamento
+1. **Esplora il codice**: `Core/Chiosco.swift` (FSM)
+2. **Personalizza UI**: `Views/ContentView.swift`
+3. **Aggiungi log**: `Logger.debug("...")`
+4. **Testa su dispositivo reale**: Vedi [SETUP.md](SETUP.md#-esegui-su-dispositivo-fisico)
 
-Buon sviluppo! 🚀
+Buon divertimento! 🚀

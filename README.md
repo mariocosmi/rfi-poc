@@ -2,11 +2,15 @@
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/df75ca80-8ad7-4527-b16d-2a3ea39c0d7a/deploy-status)](https://app.netlify.com/sites/rfi-poc-chiosco/deploys)
 
-Proof of Concept di un chiosco ingresso ferroviario basato su web. Gli utenti possono accedere pagando 1,20€ tramite monete o carta di credito, oppure mostrando codici autorizzati (QR o carta contactless).
+Proof of Concept di un chiosco ingresso ferroviario **multi-piattaforma**. Gli utenti possono accedere pagando 1,20€ tramite monete o carta di credito, oppure mostrando codici autorizzati (QR o carta contactless).
+
+**Piattaforme disponibili**:
+- 🌐 **Web App** (HTML/CSS/JavaScript vanilla)
+- 📱 **iOS App** (Swift + SwiftUI) - Vedi [ios-app/](ios-app/)
 
 ## 🌐 Demo Live
 
-**[🚀 Prova il simulatore](https://rfi-poc-chiosco.netlify.app)**
+**[🚀 Prova il simulatore web](https://rfi-poc-chiosco.netlify.app)**
 
 Il sito è hostato su Netlify con deploy automatici ad ogni push su master.
 
@@ -29,21 +33,30 @@ Il sito è hostato su Netlify con deploy automatici ad ogni push su master.
 
 ## 🛠️ Stack Tecnologico
 
+### Web App
 - **Frontend**: HTML5, CSS3, JavaScript ES6+ vanilla
 - **Architettura**: Finite State Machine (FSM)
 - **Testing**: Playwright 1.56.0
 - **Logging**: loglevel 1.9.1
 - **Deployment**: File statici (no build step, no server-side)
 
+### iOS App
+- **Framework**: SwiftUI (UI dichiarativa)
+- **Linguaggio**: Swift 5.9+
+- **Architettura**: MVVM + FSM (stessa logica della web app)
+- **Logging**: os.log (nativo Apple)
+- **Target**: iOS 17.0+, iPhone/iPad
+- **Dipendenze**: Nessuna (solo framework iOS nativi)
+
 ## 📦 Installazione
 
-### Prerequisiti
+### Web App
 
+#### Prerequisiti
 - Browser moderno (Chrome, Firefox, Safari, Edge - ultime 2 versioni)
 - Node.js 18+ (solo per test E2E)
 
-### Setup
-
+#### Setup
 1. **Clone del repository**
    ```bash
    git clone https://github.com/mariocosmi/rfi-poc.git
@@ -64,6 +77,25 @@ Il sito è hostato su Netlify con deploy automatici ad ogni push su master.
    python3 -m http.server 8000
    # Visita: http://localhost:8000
    ```
+
+### iOS App
+
+#### Prerequisiti
+- macOS Ventura 13+
+- Xcode 15+
+- iOS 17+ (dispositivo o simulatore)
+
+#### Setup Rapido
+```bash
+cd ios-app
+./setup.sh
+```
+
+Lo script configura automaticamente il progetto Xcode. Poi:
+1. Seleziona simulatore iPhone/iPad
+2. Premi ⌘+R per eseguire
+
+**Documentazione completa**: [ios-app/SETUP.md](ios-app/SETUP.md)
 
 ## 🎯 Utilizzo
 
