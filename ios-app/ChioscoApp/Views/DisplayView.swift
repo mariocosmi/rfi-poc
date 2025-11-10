@@ -12,41 +12,42 @@ struct DisplayView: View {
     @EnvironmentObject var chiosco: Chiosco
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 10) {
             // Messaggio principale
             Text(chiosco.display.messaggio)
-                .font(.title3)
+                .font(.body)
                 .fontWeight(.semibold)
                 .multilineTextAlignment(.center)
                 .foregroundColor(colorForTipo(chiosco.display.tipoMessaggio))
-                .padding()
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
 
             // Importo rimanente
             if let importo = chiosco.display.importoRimanente {
                 Text("Rimanente: \(formattaImporto(importo))")
-                    .font(.title2)
+                    .font(.title3)
                     .fontWeight(.bold)
                     .foregroundColor(.primary)
             }
 
             // Countdown timeout
             if let countdown = chiosco.display.countdownSecondi {
-                HStack {
+                HStack(spacing: 4) {
                     Image(systemName: "clock.fill")
                     Text("Timeout: \(countdown)s")
                 }
-                .font(.subheadline)
+                .font(.caption)
                 .foregroundColor(.orange)
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 24)
+        .padding(.vertical, 12)
         .background(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 12)
                 .fill(backgroundForTipo(chiosco.display.tipoMessaggio))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 12)
                 .stroke(colorForTipo(chiosco.display.tipoMessaggio), lineWidth: 2)
         )
     }

@@ -2,8 +2,8 @@
 //  ContentView.swift
 //  ChioscoApp
 //
-//  Vista principale ottimizzata per mobile
-//  Layout con TabView per dividere funzionalità senza scrolling
+//  Vista principale RESPONSIVE ottimizzata per tutte le risoluzioni iPhone
+//  Layout con TabView - Supporta iPhone SE (667pt) fino a Pro Max (932pt)
 //
 
 import SwiftUI
@@ -13,66 +13,69 @@ struct ContentView: View {
     @State private var selectedTab = 0
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Header fisso
-            HeaderView()
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
+                // Header fisso (compatto)
+                HeaderView()
 
-            // Display sempre visibile
-            DisplayView()
-                .padding(.horizontal)
-                .padding(.top, 12)
+                // Display sempre visibile (adattivo)
+                DisplayView()
+                    .padding(.horizontal, 12)
+                    .padding(.top, 8)
 
-            // StatusBar compatto (icone porta + cassetta)
-            StatusBarView()
-                .padding(.top, 8)
+                // StatusBar compatto (icone porta + cassetta)
+                StatusBarView()
+                    .padding(.top, 6)
 
-            // Pulsante Persona Passata (solo se porta aperta)
-            if chiosco.porta.stato == .aperta {
-                Button(action: {
-                    chiosco.onPassaggioPersona()
-                }) {
-                    HStack {
-                        Image(systemName: "figure.walk")
-                        Text("Persona passata")
+                // Pulsante Persona Passata (solo se porta aperta)
+                if chiosco.porta.stato == .aperta {
+                    Button(action: {
+                        chiosco.onPassaggioPersona()
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "figure.walk")
+                            Text("Persona passata")
+                                .fontWeight(.semibold)
+                        }
+                        .font(.subheadline)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(Color.blue)
+                        .cornerRadius(10)
                     }
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(12)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 8)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                    .animation(.spring(), value: chiosco.porta.stato)
                 }
-                .padding(.horizontal)
-                .padding(.top, 12)
-                .transition(.move(edge: .top).combined(with: .opacity))
-                .animation(.spring(), value: chiosco.porta.stato)
+
+                // TabView per funzionalità
+                TabView(selection: $selectedTab) {
+                    // Tab 1: Pagamento
+                    PagamentoTabView()
+                        .tabItem {
+                            Label("Pagamento", systemImage: "eurosign.circle.fill")
+                        }
+                        .tag(0)
+
+                    // Tab 2: Accesso Autorizzato
+                    AccessoTabView()
+                        .tabItem {
+                            Label("Accesso", systemImage: "key.fill")
+                        }
+                        .tag(1)
+
+                    // Tab 3: Info
+                    InfoTabView(screenHeight: geometry.size.height)
+                        .tabItem {
+                            Label("Info", systemImage: "info.circle.fill")
+                        }
+                        .tag(2)
+                }
             }
-
-            // TabView per funzionalità
-            TabView(selection: $selectedTab) {
-                // Tab 1: Pagamento
-                PagamentoTabView()
-                    .tabItem {
-                        Label("Pagamento", systemImage: "eurosign.circle.fill")
-                    }
-                    .tag(0)
-
-                // Tab 2: Accesso Autorizzato
-                AccessoTabView()
-                    .tabItem {
-                        Label("Accesso", systemImage: "key.fill")
-                    }
-                    .tag(1)
-
-                // Tab 3: Info
-                InfoTabView()
-                    .tabItem {
-                        Label("Info", systemImage: "info.circle.fill")
-                    }
-                    .tag(2)
-            }
+            .background(Color(UIColor.systemGroupedBackground))
         }
-        .background(Color(UIColor.systemGroupedBackground))
     }
 }
 
@@ -84,14 +87,14 @@ struct PagamentoTabView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
+            VStack(spacing: 12) {
                 // Gettoniera
                 GettonierapView()
 
                 // Pagamento Carta
                 PagamentoCartaView()
             }
-            .padding()
+            .padding(12)
         }
     }
 }
@@ -100,7 +103,7 @@ struct PagamentoTabView: View {
 struct AccessoTabView: View {
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
+            VStack(spacing: 12) {
                 // Lettore QR
                 LettoreQRView()
 
@@ -108,97 +111,112 @@ struct AccessoTabView: View {
                 LettoreCarteView()
 
                 // Info codici autorizzati
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 6) {
                     HStack {
                         Image(systemName: "info.circle.fill")
                             .foregroundColor(.blue)
                         Text("Codici Autorizzati")
-                            .font(.headline)
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
                     }
 
                     Text("I codici autorizzati sono numeri da 1 a 99")
-                        .font(.subheadline)
+                        .font(.caption)
                         .foregroundColor(.secondary)
 
-                    Text("Esempi: 1, 42, 99 ✅")
-                        .font(.caption)
-                        .foregroundColor(.green)
+                    HStack(spacing: 12) {
+                        Text("Validi: 1, 42, 99 ✅")
+                            .font(.caption2)
+                            .foregroundColor(.green)
 
-                    Text("Non validi: 0, 100, abc ❌")
-                        .font(.caption)
-                        .foregroundColor(.red)
+                        Text("Non validi: 0, 100, abc ❌")
+                            .font(.caption2)
+                            .foregroundColor(.red)
+                    }
                 }
-                .padding()
+                .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(
-                    RoundedRectangle(cornerRadius: 16)
+                    RoundedRectangle(cornerRadius: 12)
                         .fill(Color(UIColor.secondarySystemBackground))
                 )
             }
-            .padding()
+            .padding(12)
         }
     }
 }
 
-/// Tab Info (Stato dettagliato + Porta)
+/// Tab Info (Stato dettagliato + Porta) - RESPONSIVE
 struct InfoTabView: View {
     @EnvironmentObject var chiosco: Chiosco
+    let screenHeight: CGFloat
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
-                // Porta (grande)
-                PortaDetailView()
+            VStack(spacing: 12) {
+                // Porta (dimensione adattiva basata su schermo)
+                PortaDetailView(maxHeight: portaHeight)
 
                 // Stato Sistema
                 StatoSistemaView()
 
                 // Info Versione
-                VStack(spacing: 8) {
+                VStack(spacing: 6) {
                     Text("ChioscoApp iOS")
-                        .font(.headline)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
 
                     Text("Versione 1.0")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-
-                    Text("Swift + SwiftUI")
                         .font(.caption)
                         .foregroundColor(.secondary)
+
+                    Text("Swift + SwiftUI • Responsive")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
                 }
-                .padding()
+                .padding(12)
                 .frame(maxWidth: .infinity)
                 .background(
-                    RoundedRectangle(cornerRadius: 16)
+                    RoundedRectangle(cornerRadius: 12)
                         .fill(Color(UIColor.secondarySystemBackground))
                 )
             }
-            .padding()
+            .padding(12)
         }
+    }
+
+    /// Calcola altezza porta in base allo schermo (25-30% dello spazio disponibile)
+    private var portaHeight: CGFloat {
+        // Sottrai header (70) + display (~80) + statusBar (35) + tab bar (50) + padding
+        let availableHeight = screenHeight - 235
+        let desiredHeight = availableHeight * 0.35 // 35% dello spazio disponibile
+        // Clamp tra 140pt (min) e 200pt (max)
+        return min(max(desiredHeight, 140), 200)
     }
 }
 
 // MARK: - Componenti Info Tab
 
-/// Vista porta dettagliata (solo in tab Info)
+/// Vista porta dettagliata (solo in tab Info) - RESPONSIVE
 struct PortaDetailView: View {
     @EnvironmentObject var chiosco: Chiosco
+    let maxHeight: CGFloat
 
     var body: some View {
-        VStack(spacing: 16) {
-            // Icona porta grande
+        VStack(spacing: 12) {
+            // Icona porta grande (responsive)
             ZStack {
-                RoundedRectangle(cornerRadius: 20)
+                RoundedRectangle(cornerRadius: 16)
                     .fill(chiosco.porta.stato == .aperta ? Color.green.opacity(0.3) : Color.gray.opacity(0.3))
-                    .frame(height: 200)
+                    .frame(height: maxHeight)
 
-                VStack(spacing: 12) {
+                VStack(spacing: 8) {
                     Image(systemName: chiosco.porta.stato == .aperta ? "door.left.hand.open" : "door.left.hand.closed")
-                        .font(.system(size: 60))
+                        .font(.system(size: iconSize))
                         .foregroundColor(chiosco.porta.stato == .aperta ? .green : .gray)
 
                     Text("PORTA")
-                        .font(.title2)
+                        .font(titleFont)
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
                 }
@@ -212,91 +230,126 @@ struct PortaDetailView: View {
                     .foregroundColor(chiosco.porta.stato == .aperta ? .green : .red)
 
                 Text(chiosco.porta.stato == .aperta ? "Aperta" : "Chiusa")
-                    .font(.headline)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
                     .foregroundColor(chiosco.porta.stato == .aperta ? .green : .red)
             }
-            .padding()
+            .padding(10)
             .frame(maxWidth: .infinity)
             .background(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 10)
                     .fill(Color(UIColor.tertiarySystemBackground))
             )
         }
-        .padding()
+        .padding(12)
         .background(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 12)
                 .fill(Color(UIColor.secondarySystemBackground))
         )
     }
+
+    // Dimensione icona proporzionale all'altezza porta
+    private var iconSize: CGFloat {
+        maxHeight * 0.3 // 30% dell'altezza porta
+    }
+
+    // Font titolo adattivo
+    private var titleFont: Font {
+        maxHeight > 180 ? .title2 : .headline
+    }
 }
 
-/// Vista stato sistema
+/// Vista stato sistema - COMPATTA
 struct StatoSistemaView: View {
     @EnvironmentObject var chiosco: Chiosco
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Image(systemName: "gearshape.fill")
                     .foregroundColor(.blue)
+                    .font(.subheadline)
                 Text("Stato Sistema")
-                    .font(.headline)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
             }
 
             Divider()
 
             // Stato FSM
-            HStack {
-                Text("Stato:")
-                    .foregroundColor(.secondary)
-                Spacer()
-                Text(chiosco.stato.rawValue)
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.blue.opacity(0.2))
-                    .cornerRadius(6)
-            }
+            InfoRow(
+                label: "Stato:",
+                value: chiosco.stato.rawValue,
+                valueColor: .blue,
+                isTag: true
+            )
 
             // Saldo cassetta
-            HStack {
-                Text("Saldo cassetta:")
-                    .foregroundColor(.secondary)
-                Spacer()
-                Text(GettonierapModello.formattaImporto(chiosco.gettoniera.saldoCassetta))
-                    .fontWeight(.semibold)
-                    .foregroundColor(chiosco.gettoniera.saldoCassetta > 0 ? .orange : .gray)
-            }
+            InfoRow(
+                label: "Saldo cassetta:",
+                value: GettonierapModello.formattaImporto(chiosco.gettoniera.saldoCassetta),
+                valueColor: chiosco.gettoniera.saldoCassetta > 0 ? .orange : .secondary
+            )
 
             // Importo richiesto
-            HStack {
-                Text("Importo richiesto:")
-                    .foregroundColor(.secondary)
-                Spacer()
-                Text(GettonierapModello.formattaImporto(chiosco.gettoniera.importoRichiesto))
-                    .fontWeight(.semibold)
-            }
+            InfoRow(
+                label: "Importo richiesto:",
+                value: GettonierapModello.formattaImporto(chiosco.gettoniera.importoRichiesto)
+            )
 
             // Stato porta
             HStack {
                 Text("Porta:")
+                    .font(.caption)
                     .foregroundColor(.secondary)
                 Spacer()
                 HStack(spacing: 4) {
                     Circle()
                         .fill(chiosco.porta.stato == .aperta ? Color.green : Color.gray)
-                        .frame(width: 8, height: 8)
+                        .frame(width: 6, height: 6)
                     Text(chiosco.porta.stato.rawValue)
+                        .font(.caption)
                         .fontWeight(.semibold)
                         .foregroundColor(chiosco.porta.stato == .aperta ? .green : .gray)
                 }
             }
         }
-        .padding()
+        .padding(12)
         .background(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 12)
                 .fill(Color(UIColor.secondarySystemBackground))
         )
+    }
+}
+
+/// Componente riutilizzabile per riga info
+struct InfoRow: View {
+    let label: String
+    let value: String
+    var valueColor: Color = .primary
+    var isTag: Bool = false
+
+    var body: some View {
+        HStack {
+            Text(label)
+                .font(.caption)
+                .foregroundColor(.secondary)
+            Spacer()
+            if isTag {
+                Text(value)
+                    .font(.caption2)
+                    .fontWeight(.medium)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 3)
+                    .background(valueColor.opacity(0.2))
+                    .cornerRadius(5)
+            } else {
+                Text(value)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundColor(valueColor)
+            }
+        }
     }
 }
 
@@ -309,22 +362,23 @@ struct HeaderView: View {
                 .ignoresSafeArea(edges: .top)
 
             HStack {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text("🚪 Chiosco Ingresso")
-                        .font(.title2)
+                        .font(.title3)
                         .fontWeight(.bold)
                         .foregroundColor(.white)
 
                     Text("Simulatore iOS")
-                        .font(.caption)
+                        .font(.caption2)
                         .foregroundColor(.white.opacity(0.9))
                 }
 
                 Spacer()
             }
-            .padding()
+            .padding(.horizontal, 16)
+            .padding(.bottom, 8)
         }
-        .frame(height: 80)
+        .frame(height: 70)
     }
 }
 
