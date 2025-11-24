@@ -154,11 +154,8 @@ class Chiosco {
     }
 
     // FEATURE 002: Nascondi e resetta pulsante "Persona passata"
-    const btnPassaggio = document.getElementById('btn-passaggio-persona');
-    if (btnPassaggio) {
-      btnPassaggio.classList.add('hidden');
-      btnPassaggio.disabled = false;
-      log.debug('🚶 Pulsante "Persona passata" nascosto e resettato');
+    if (this.display) {
+      this.display.gestisciPulsantePassaggio(false, true);
     }
 
     // Riabilita tutti gli input
@@ -230,11 +227,8 @@ class Chiosco {
     }
 
     // FEATURE 002: Mostra pulsante "Persona passata"
-    const btnPassaggio = document.getElementById('btn-passaggio-persona');
-    if (btnPassaggio) {
-      btnPassaggio.classList.remove('hidden');
-      btnPassaggio.disabled = false;
-      log.debug('🚶 Pulsante "Persona passata" visibile');
+    if (this.display) {
+      this.display.gestisciPulsantePassaggio(true, true);
     }
 
     // Mostra messaggio successo
@@ -284,46 +278,14 @@ class Chiosco {
    * @param {boolean} abilitato - true per abilitare, false per disabilitare
    * @param {string[]} eccezioni - Input da non modificare
    */
+  /**
+   * Abilita/disabilita input
+   * Delega a Display
+   */
   abilitaInput(abilitato, eccezioni = []) {
-    // Pulsanti monete
-    if (!eccezioni.includes('monete')) {
-      const pulsantiMonete = document.querySelectorAll('.btn-moneta');
-      pulsantiMonete.forEach(btn => {
-        btn.disabled = !abilitato;
-      });
+    if (this.display) {
+      this.display.abilitaInput(abilitato, eccezioni);
     }
-
-    // Pulsante pagamento carta (VISA)
-    if (!eccezioni.includes('pagamento-carta')) {
-      const btnPagaCarta = document.getElementById('btn-paga-carta');
-      if (btnPagaCarta) btnPagaCarta.disabled = !abilitato;
-    }
-
-    // Pulsante carta autorizzata + input (singolo, come QR)
-    if (!eccezioni.includes('carta')) {
-      const btnVerificaCarta = document.getElementById('btn-verifica-carta');
-      const inputCarta = document.getElementById('input-carta');
-
-      if (btnVerificaCarta) btnVerificaCarta.disabled = !abilitato;
-      if (inputCarta) inputCarta.disabled = !abilitato;
-    }
-
-    // QR
-    if (!eccezioni.includes('qr')) {
-      const btnQR = document.getElementById('btn-scansiona-qr');
-      const inputQR = document.getElementById('input-qr');
-      if (btnQR) btnQR.disabled = !abilitato;
-      if (inputQR) inputQR.disabled = !abilitato;
-    }
-
-    // FEATURE 003 (T031): Pulsanti azzeramento
-    // Pulsanti azzeramento: gestiti da display, non modificare qui
-    // (vengono abilitati solo in MANUTENZIONE_SCELTA_AZZERAMENTO)
-
-    // FEATURE 004: Pulsanti Apri/Chiudi cassetta (btn-apri-cassetta-004, btn-chiudi-cassetta-004)
-    // sono SEMPRE abilitati - simulano eventi hardware, non sono input utente
-
-    log.debug(`Input ${abilitato ? 'abilitati' : 'disabilitati'}${eccezioni.length ? ' (eccezioni: ' + eccezioni.join(', ') + ')' : ''}`);
   }
 
   /**
@@ -355,11 +317,8 @@ class Chiosco {
     log.debug('🚶 Click pulsante "Persona passata"');
 
     // Disabilita e nascondi pulsante immediatamente
-    const btnPassaggio = document.getElementById('btn-passaggio-persona');
-    if (btnPassaggio) {
-      btnPassaggio.disabled = true;
-      btnPassaggio.classList.add('hidden');
-      log.debug('🚶 Pulsante "Persona passata" disabilitato e nascosto');
+    if (this.display) {
+      this.display.gestisciPulsantePassaggio(false, false);
     }
 
     // Mostra feedback su display
@@ -502,10 +461,8 @@ class Chiosco {
     this.gestoreManutenzione.fermaCountdown();
 
     // Abilita SOLO pulsante "Chiudi Cassetta"
-    const btnChiudiCassetta = document.getElementById('btn-chiudi-cassetta');
-    if (btnChiudiCassetta) {
-      btnChiudiCassetta.disabled = false;
-      log.debug('🔧 Pulsante "Chiudi Cassetta" abilitato');
+    if (this.display) {
+      this.display.gestisciPulsanteChiudiCassetta(true);
     }
 
     const codice = this.operazioneCorrente?.codiceOperatore || 'N/A';

@@ -214,6 +214,98 @@ class Display {
     this.mostraMessaggio(messaggio, 'info');
     this.mostraImporto(importo);
   }
+  /**
+   * Gestisce visibilità e stato del pulsante "Persona passata"
+   * @param {boolean} visibile - Se il pulsante deve essere visibile
+   * @param {boolean} abilitato - Se il pulsante deve essere abilitato
+   */
+  gestisciPulsantePassaggio(visibile, abilitato) {
+    const btnPassaggio = document.getElementById('btn-passaggio-persona');
+    if (!btnPassaggio) return;
+
+    if (visibile) {
+      btnPassaggio.classList.remove('hidden');
+    } else {
+      btnPassaggio.classList.add('hidden');
+    }
+
+    btnPassaggio.disabled = !abilitato;
+    log.debug(`Display: pulsante passaggio ${visibile ? 'visibile' : 'nascosto'}, ${abilitato ? 'abilitato' : 'disabilitato'}`);
+  }
+
+  /**
+   * Gestisce stato del pulsante "Chiudi Cassetta"
+   * @param {boolean} abilitato - Se il pulsante deve essere abilitato
+   */
+  gestisciPulsanteChiudiCassetta(abilitato) {
+    const btnChiudiCassetta = document.getElementById('btn-chiudi-cassetta');
+    if (btnChiudiCassetta) {
+      btnChiudiCassetta.disabled = !abilitato;
+      log.debug(`Display: pulsante chiudi cassetta ${abilitato ? 'abilitato' : 'disabilitato'}`);
+    }
+  }
+
+  /**
+   * Abilita/disabilita input dell'interfaccia
+   * @param {boolean} abilitato - true per abilitare, false per disabilitare
+   * @param {string[]} eccezioni - Input da non modificare ('monete', 'pagamento-carta', 'carta', 'qr')
+   */
+  abilitaInput(abilitato, eccezioni = []) {
+    // Pulsanti monete
+    if (!eccezioni.includes('monete')) {
+      const pulsantiMonete = document.querySelectorAll('.btn-moneta');
+      pulsantiMonete.forEach(btn => {
+        btn.disabled = !abilitato;
+      });
+    }
+
+    // Pulsante pagamento carta (VISA)
+    if (!eccezioni.includes('pagamento-carta')) {
+      const btnPagaCarta = document.getElementById('btn-paga-carta');
+      if (btnPagaCarta) btnPagaCarta.disabled = !abilitato;
+    }
+
+    // Pulsante carta autorizzata + input (singolo, come QR)
+    if (!eccezioni.includes('carta')) {
+      const btnVerificaCarta = document.getElementById('btn-verifica-carta');
+      const inputCarta = document.getElementById('input-carta');
+
+      if (btnVerificaCarta) btnVerificaCarta.disabled = !abilitato;
+      if (inputCarta) inputCarta.disabled = !abilitato;
+    }
+
+    // QR
+    if (!eccezioni.includes('qr')) {
+      const btnQR = document.getElementById('btn-scansiona-qr');
+      const inputQR = document.getElementById('input-qr');
+      if (btnQR) btnQR.disabled = !abilitato;
+      if (inputQR) inputQR.disabled = !abilitato;
+    }
+
+    log.debug(`Display: input ${abilitato ? 'abilitati' : 'disabilitati'}${eccezioni.length ? ' (eccezioni: ' + eccezioni.join(', ') + ')' : ''}`);
+  }
+
+  /**
+   * Mostra uno spinner di caricamento in un container
+   * @param {HTMLElement} container - Elemento dove appendere lo spinner
+   * @param {string} id - ID da assegnare allo spinner
+   */
+  mostraSpinner(container, id) {
+    if (!container) return;
+    const spinner = document.createElement('div');
+    spinner.className = 'spinner';
+    spinner.id = id;
+    container.appendChild(spinner);
+  }
+
+  /**
+   * Rimuove uno spinner specifico
+   * @param {string} id - ID dello spinner da rimuovere
+   */
+  rimuoviSpinner(id) {
+    const spinner = document.getElementById(id);
+    if (spinner) spinner.remove();
+  }
 }
 
 // Export globale
