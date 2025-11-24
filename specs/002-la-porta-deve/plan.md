@@ -142,6 +142,20 @@ Vedi [quickstart.md](./quickstart.md) per:
 - **Medio**: Messaggio display non chiaro, animazione non fluida
 - **Basso**: Tooltip mancante, spaziatura pulsante non ottimale
 
+### Test Automatici (Playwright)
+
+È stata implementata una suite di test E2E completa in `tests/e2e/feature-002-passaggio-persona.spec.js` che copre:
+- US1: Chiusura manuale e timing (< 2s)
+- US2: Visibilità condizionale del pulsante
+- US3: Verifica dei log in console
+- Edge cases: Click multipli, click rapidi, click a fine timer
+- Regression testing: Feature 001 (pagamento monete) funziona ancora
+
+**Comando esecuzione**:
+```bash
+npm test
+```
+
 ### Test di Accettazione per User Story
 
 #### US1: Chiusura Porta Manuale dopo Passaggio (P1 - MVP)

@@ -65,6 +65,16 @@ Questo documento traccia il debito tecnico identificato nel progetto, in partico
 - Manutenibilità: logica show/hide centralizzata
 - Polishing finale codebase bassa priorità completato
 
+### ✅ Sprint 4 (2025-11-24) - Refactoring Architetturale
+**Commit**: `[in corso]`
+**Effort**: 4h
+**Violazioni risolte**: TD-010, TD-011
+
+**Risultati**:
+- ✅ TD-010: Refactored `Gettoniera` per usare interi (centesimi) internamente. Eliminati errori precisione float.
+- ✅ TD-011: Refactored `Chiosco` e `Display`. Spostata logica UI in `Display`. Disaccoppiamento completo.
+- ✅ Test E2E: 57/57 passati, 0 regressioni.
+
 ---
 
 ## Violazioni Alta Priorità
@@ -93,7 +103,34 @@ Questo documento traccia il debito tecnico identificato nel progetto, in partico
 
 ---
 
+### ✅ TD-010: Precisione Valuta (Floating Point) - COMPLETATO
+**Status**: ✅ Risolto in Sprint 4
+**File**: `js/gettoniera.js`
+**Soluzione**: Conversione interna a centesimi (interi). Interfaccia pubblica invariata.
+**Risultato**: Eliminazione totale errori arrotondamento float. Test robusti su interi.
+
+---
+
+### ✅ TD-011: Accoppiamento UI/Logica - COMPLETATO
+**Status**: ✅ Risolto in Sprint 4
+**File**: `js/chiosco.js`, `js/display.js`
+**Soluzione**: Centralizzazione manipolazione DOM in `Display`. `Chiosco` agnostico rispetto al DOM.
+**Risultato**: Migliore testabilità e separazione responsabilità.
+
+---
+
 ## Violazioni Media Priorità
+<...rest of file...>
+
+### ✅ Sprint 3 (Priorità BASSA - Opzionale) - COMPLETATO
+- [x] TD-006: Valutato abilitaInput (già ottimizzato)
+- [x] TD-007: Valutato apri/chiudi SensoreCassetta (sotto soglia)
+- [x] TD-008: Refactored display.js show/hide patterns
+
+### ✅ Sprint 4 (Refactoring Architetturale) - COMPLETATO
+- [x] TD-010: Precisione Valuta
+- [x] TD-011: Accoppiamento UI
+
 
 ### ✅ TD-004: Pattern Log Click (9 occorrenze) - COMPLETATO
 **Status**: ✅ Risolto in Sprint 1 (commit `545bf94`)

@@ -80,6 +80,7 @@ Il sistema è orchestrato da una macchina a stati (`chiosco.js`):
 ### Component Communication
 
 - **Chiosco** (FSM) coordina tutti i componenti
+- **Display** centralizza TUTTA la manipolazione del DOM (UI Decoupling)
 - Ogni componente (Display, Porta, Gettoniera, Lettori) è una classe indipendente
 - `app.js` inizializza componenti, li collega al Chiosco e registra event handlers
 - Comunicazione via riferimenti diretti: `chiosco.display.mostraMessaggio(...)`, `chiosco.porta.apri()`
@@ -101,7 +102,14 @@ python3 -m http.server 8000
 # Visita: http://localhost:8000
 ```
 
-**Testing**: Aprire DevTools console per vedere log dettagliati. Set log level:
+**Testing Automato (Playwright)**:
+```bash
+npm test              # Esegue tutti i test (headless)
+npm run test:ui       # Apre UI interattiva Playwright
+npm run test:headed   # Esegue test con browser visibile
+```
+
+**Testing Manuale**: Aprire DevTools console per vedere log dettagliati. Set log level:
 ```javascript
 log.setLevel('debug')  // DEBUG, INFO, WARN, ERROR
 ```
@@ -130,7 +138,7 @@ Il progetto usa SpecKit per gestire feature specs. Ogni feature ha una directory
 
 1. **Per nuove feature**: Creare spec in `specs/NNN-nome-feature/spec.md` seguendo template
 2. **Per modifiche UI/logica**: Modificare file JS/CSS appropriato
-3. **Testing**: Verificare manualmente nel browser seguendo scenari in `specs/*/plan.md`
+3. **Testing**: Eseguire `npm test` per regressioni + verifica manuale
 4. **Logging**: Aggiungere log appropriati (`log.debug/info/warn/error`)
 5. **Constitution check**: Verificare conformità principi (specialmente se aggiungete dipendenze)
 
@@ -141,6 +149,9 @@ Commit in italiano con formato standard del repository
 
 ## Key Implementation Details
 
+### Currency Precision
+La classe `Gettoniera` gestisce internamente gli importi in **centesimi (interi)** per evitare errori di precisione floating point. L'interfaccia pubblica accetta/restituisce Euro per compatibilità.
+
 ### Timeout Management
 
 - `GestoreTimeout` (in `chiosco.js`) gestisce timeout inattività 20s durante pagamento monete
@@ -150,14 +161,14 @@ Commit in italiano con formato standard del repository
 
 ### Input Locking
 
-- Durante operazioni (lettura carte/QR, transazioni), altri input disabilitati tramite `chiosco.abilitaInput(false)`
+- Durante operazioni (lettura carte/QR, transazioni), altri input disabilitati tramite `chiosco.display.abilitaInput(false)`
 - Previene accessi simultanei e conflitti stato
 
 ### Payment Flow
 
 **Monete**:
 1. Click moneta → transizione `IDLE` → `PAGAMENTO_MONETE`
-2. `gettoniera.inserisciMoneta(valore)` → calcola rimanente
+2. `gettoniera.inserisciMoneta(valore)` → converte in centesimi, calcola rimanente
 3. Se rimanente <= 0 → `chiosco.verificaPagamento()` → transizione `PORTA_APERTA`
 
 **Carta (pagamento)**:
