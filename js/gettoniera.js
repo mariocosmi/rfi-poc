@@ -1,43 +1,49 @@
 /**
  * Gettoniera - Simulazione gettoniera per pagamento con monete
  * Gestisce inserimento monete e calcolo importo rimanente
+ * 
+ * Refactoring: Usa centesimi internamente per evitare errori floating point
  */
 
 class Gettoniera {
   constructor(importoRichiesto = 1.20) {
-    this.importoRichiesto = importoRichiesto;
-    this.importoInserito = 0;
-    this.moneteInserite = [];
+    // Converti importo richiesto in centesimi
+    this.importoRichiestoCents = Math.round(importoRichiesto * 100);
+    this.importoInseritoCents = 0;
+    this.moneteInserite = []; // Mantiene valori originali in Euro per log/display
 
     // FEATURE 003: Saldo totale cassetta (non si azzera al reset)
-    this.saldoCassetta = 0;
+    this.saldoCassettaCents = 0;
 
-    // Tagli monete disponibili (in euro)
-    this.tagliDisponibili = [1.00, 0.50, 0.20, 0.10, 0.05, 0.02, 0.01];
+    // Tagli monete disponibili (in centesimi)
+    this.tagliDisponibiliCents = [100, 50, 20, 10, 5, 2, 1];
 
-    log.info(`💰 Gettoniera inizializzata - Importo richiesto: ${Gettoniera.formattaImporto(this.importoRichiesto)}`);
+    log.info(`💰 Gettoniera inizializzata - Importo richiesto: ${Gettoniera.formattaImporto(this.importoRichiestoCents / 100)}`);
   }
 
   /**
    * Inserisci una moneta
-   * @param {number} valore - Valore moneta in euro
+   * @param {number} valore - Valore moneta in euro (es. 0.50)
    * @returns {boolean} true se inserimento riuscito
    */
   inserisciMoneta(valore) {
+    // Converti in centesimi per validazione e calcoli
+    const valoreCents = Math.round(valore * 100);
+
     // Verifica che sia un taglio valido
-    if (!this.tagliDisponibili.includes(valore)) {
+    if (!this.tagliDisponibiliCents.includes(valoreCents)) {
       log.warn(`⚠️ Taglio moneta non valido: ${Gettoniera.formattaImporto(valore)}`);
       return false;
     }
 
     // Inserisci moneta (pagamento corrente + cassetta)
-    this.importoInserito += valore;
+    this.importoInseritoCents += valoreCents;
     this.moneteInserite.push(valore);
-    this.saldoCassetta += valore;
+    this.saldoCassettaCents += valoreCents;
 
     const rimanente = this.getImportoRimanente();
 
-    log.info(`💰 Moneta inserita: ${Gettoniera.formattaImporto(valore)} | Totale: ${Gettoniera.formattaImporto(this.importoInserito)} | Rimanente: ${Gettoniera.formattaImporto(rimanente)} | Saldo cassetta: ${Gettoniera.formattaImporto(this.saldoCassetta)}`);
+    log.info(`💰 Moneta inserita: ${Gettoniera.formattaImporto(valore)} | Totale: ${Gettoniera.formattaImporto(this.importoInseritoCents / 100)} | Rimanente: ${Gettoniera.formattaImporto(rimanente)} | Saldo cassetta: ${Gettoniera.formattaImporto(this.saldoCassettaCents / 100)}`);
 
     // Aggiorna display saldo cassetta
     this.aggiornaSaldoCassetta();
@@ -47,12 +53,11 @@ class Gettoniera {
 
   /**
    * Ottieni importo rimanente da versare
-   * @returns {number} Importo rimanente (0 se pagamento completato)
+   * @returns {number} Importo rimanente in Euro (0 se pagamento completato)
    */
   getImportoRimanente() {
-    const rimanente = this.importoRichiesto - this.importoInserito;
-    // Arrotonda a 2 decimali per evitare problemi float
-    return Math.max(0, Math.round(rimanente * 100) / 100);
+    const rimanenteCents = this.importoRichiestoCents - this.importoInseritoCents;
+    return Math.max(0, rimanenteCents / 100);
   }
 
   /**
@@ -60,20 +65,20 @@ class Gettoniera {
    * @returns {boolean} true se importo inserito >= importo richiesto
    */
   isPagamentoCompletato() {
-    return this.getImportoRimanente() <= 0;
+    return this.importoInseritoCents >= this.importoRichiestoCents;
   }
 
   /**
    * Ottieni importo inserito
-   * @returns {number} Importo totale inserito
+   * @returns {number} Importo totale inserito in Euro
    */
   getImportoInserito() {
-    return Math.round(this.importoInserito * 100) / 100;
+    return this.importoInseritoCents / 100;
   }
 
   /**
    * Ottieni lista monete inserite
-   * @returns {number[]} Array di valori monete inserite
+   * @returns {number[]} Array di valori monete inserite (in Euro)
    */
   getMoneteInserite() {
     return [...this.moneteInserite];
@@ -84,20 +89,20 @@ class Gettoniera {
    * NOTA: Azzera solo importo corrente, NON il saldo cassetta
    */
   reset() {
-    const vecchioImporto = this.importoInserito;
+    const vecchioImportoCents = this.importoInseritoCents;
 
-    this.importoInserito = 0;
+    this.importoInseritoCents = 0;
     this.moneteInserite = [];
-    // NON azzerare this.saldoCassetta - rimane in cassetta!
+    // NON azzerare this.saldoCassettaCents - rimane in cassetta!
 
-    if (vecchioImporto > 0) {
-      log.debug(`💰 Gettoniera resettata (importo precedente: ${Gettoniera.formattaImporto(vecchioImporto)}) - Saldo cassetta: ${Gettoniera.formattaImporto(this.saldoCassetta)}`);
+    if (vecchioImportoCents > 0) {
+      log.debug(`💰 Gettoniera resettata (importo precedente: ${Gettoniera.formattaImporto(vecchioImportoCents / 100)}) - Saldo cassetta: ${Gettoniera.formattaImporto(this.saldoCassettaCents / 100)}`);
     }
   }
 
   /**
    * Formatta importo per display
-   * @param {number} importo - Importo da formattare
+   * @param {number} importo - Importo da formattare in Euro
    * @returns {string} Importo formattato (es. "1,20 €")
    */
   static formattaImporto(importo) {
@@ -105,13 +110,29 @@ class Gettoniera {
   }
 
   /**
+   * Ottieni importo inserito in centesimi (per testing/precisione)
+   * @returns {number} Importo in centesimi (intero)
+   */
+  getImportoInseritoCents() {
+    return this.importoInseritoCents;
+  }
+
+  /**
+   * Ottieni importo rimanente in centesimi (per testing/precisione)
+   * @returns {number} Importo rimanente in centesimi (intero)
+   */
+  getImportoRimanenteCents() {
+    return this.importoRichiestoCents - this.importoInseritoCents;
+  }
+
+  /**
    * FEATURE 003 (T022): Ottieni saldo monete corrente nella cassetta
    * @returns {number} Saldo totale monete in cassetta (euro)
    */
   getSaldoMonete() {
-    const saldo = this.saldoCassetta;
+    const saldo = this.saldoCassettaCents / 100;
     log.debug(`💰 Saldo monete cassetta: ${Gettoniera.formattaImporto(saldo)}`);
-    return Math.round(saldo * 100) / 100;
+    return saldo;
   }
 
   /**
@@ -122,13 +143,13 @@ class Gettoniera {
   azzeraSaldo() {
     const saldoPrecedente = this.getSaldoMonete();
 
-    if (saldoPrecedente <= 0) {
+    if (this.saldoCassettaCents <= 0) {
       log.info(`💰 Azzeramento saldo cassetta: già a ${Gettoniera.formattaImporto(0)}`);
       return 0;
     }
 
     // Azzera SOLO saldo cassetta, non importo corrente
-    this.saldoCassetta = 0;
+    this.saldoCassettaCents = 0;
 
     // Aggiorna display saldo cassetta
     this.aggiornaSaldoCassetta();
@@ -154,4 +175,5 @@ class Gettoniera {
 // Export globale
 window.Gettoniera = Gettoniera;
 
-log.info('✅ Gettoniera caricata');
+log.info('✅ Gettoniera caricata (versione precisione centesimi)');
+
