@@ -67,12 +67,13 @@ Questo documento traccia il debito tecnico identificato nel progetto, in partico
 
 ### ✅ Sprint 4 (2025-11-24) - Refactoring Architetturale
 **Commit**: `[in corso]`
-**Effort**: 4h
-**Violazioni risolte**: TD-010, TD-011
+**Effort**: 5h
+**Violazioni risolte**: TD-010, TD-011, TD-012
 
 **Risultati**:
 - ✅ TD-010: Refactored `Gettoniera` per usare interi (centesimi) internamente. Eliminati errori precisione float.
 - ✅ TD-011: Refactored `Chiosco` e `Display`. Spostata logica UI in `Display`. Disaccoppiamento completo.
+- ✅ TD-012: Refactored `Chiosco` con State Pattern. Eliminato switch monolitico.
 - ✅ Test E2E: 57/57 passati, 0 regressioni.
 
 ---
@@ -116,6 +117,14 @@ Questo documento traccia il debito tecnico identificato nel progetto, in partico
 **File**: `js/chiosco.js`, `js/display.js`
 **Soluzione**: Centralizzazione manipolazione DOM in `Display`. `Chiosco` agnostico rispetto al DOM.
 **Risultato**: Migliore testabilità e separazione responsabilità.
+
+---
+
+### ✅ TD-012: Switch Statement Monolitico (State Pattern) - COMPLETATO
+**Status**: ✅ Risolto in Sprint 4
+**File**: `js/chiosco.js`, `js/stati.js`
+**Soluzione**: Implementazione State Pattern con classi dedicate per ogni stato.
+**Risultato**: Open/Closed Principle rispettato, codice modulare ed estendibile.
 
 ---
 

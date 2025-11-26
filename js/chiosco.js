@@ -57,227 +57,61 @@ class Chiosco {
       }
     });
 
+    // Mappa degli stati (State Pattern)
+    this.stati = {
+      'IDLE': new StatoIdle(),
+      'PAGAMENTO_MONETE': new StatoPagamentoMonete(),
+      'PAGAMENTO_CARTA': new StatoPagamentoCarta(),
+      'VERIFICA_QR': new StatoVerificaQR(),
+      'PORTA_APERTA': new StatoPortaAperta(),
+      'TIMEOUT': new StatoTimeout(),
+      'MANUTENZIONE_AUTH_PENDING': new StatoManutenzioneAuthPending(),
+      'MANUTENZIONE_ATTESA_CHIUSURA': new StatoManutenzioneAttesaChiusura(),
+      'MANUTENZIONE_SCELTA_AZZERAMENTO': new StatoManutenzioneSceltaAzzeramento(),
+      'FUORI_SERVIZIO': new StatoFuoriServizio()
+    };
+
+    this.statoCorrente = this.stati['IDLE'];
+
     log.info('🏗️ Chiosco inizializzato - Stato: IDLE');
   }
 
   /**
    * Tenta una transizione di stato
-   * @param {string} nuovoStato - Lo stato target
+   * @param {string} nuovoStatoNome - Nome dello stato target
    * @param {object} dati - Dati opzionali per la transizione
    * @returns {boolean} true se transizione riuscita
    */
-  transizione(nuovoStato, dati = {}) {
+  transizione(nuovoStatoNome, dati = {}) {
     // Verifica se transizione è permessa
-    if (!this.transizioniPermesse[this.stato]?.includes(nuovoStato)) {
-      log.error(`❌ Transizione non permessa: ${this.stato} → ${nuovoStato}`);
+    if (!this.transizioniPermesse[this.stato]?.includes(nuovoStatoNome)) {
+      log.error(`❌ Transizione non permessa: ${this.stato} → ${nuovoStatoNome}`);
       return false;
     }
 
-    const vecchioStato = this.stato;
-    this.stato = nuovoStato;
+    const nuovoStato = this.stati[nuovoStatoNome];
+    if (!nuovoStato) {
+      log.error(`❌ Stato non trovato: ${nuovoStatoNome}`);
+      return false;
+    }
 
-    log.info(`🔄 Transizione: ${vecchioStato} → ${nuovoStato}`);
+    const vecchioStatoNome = this.stato;
 
-    // Gestisci cambio stato
-    this.onCambioStato(nuovoStato, vecchioStato, dati);
+    // Esegui uscita stato precedente (opzionale)
+    this.statoCorrente.esci(this);
+
+    // Aggiorna stato corrente
+    this.stato = nuovoStatoNome; // Mantiene compatibilità stringa
+    this.statoCorrente = nuovoStato;
+
+    log.info(`🔄 Transizione: ${vecchioStatoNome} → ${nuovoStatoNome}`);
+
+    // Esegui entrata nuovo stato
+    this.statoCorrente.entra(this, dati);
 
     return true;
   }
 
-  /**
-   * Handler per cambio di stato
-   * @param {string} nuovoStato - Nuovo stato attivo
-   * @param {string} vecchioStato - Stato precedente
-   * @param {object} dati - Dati della transizione
-   */
-  onCambioStato(nuovoStato, vecchioStato, dati) {
-    switch (nuovoStato) {
-      case 'IDLE':
-        this.onEntraIDLE();
-        break;
-
-      case 'PAGAMENTO_MONETE':
-        this.onEntraPagamentoMonete();
-        break;
-
-      case 'PAGAMENTO_CARTA':
-        this.onEntraPagamentoCarta();
-        break;
-
-      case 'VERIFICA_QR':
-        this.onEntraVerificaQR(dati.codice);
-        break;
-
-      case 'PORTA_APERTA':
-        this.onEntraPortaAperta(dati.motivo);
-        break;
-
-      case 'TIMEOUT':
-        this.onEntraTimeout();
-        break;
-
-      case 'MANUTENZIONE_AUTH_PENDING':
-        this.onEntraManutenzioneAuthPending();
-        break;
-
-      case 'MANUTENZIONE_ATTESA_CHIUSURA':
-        this.onEntraManutenzioneAttesaChiusura();
-        break;
-
-      case 'MANUTENZIONE_SCELTA_AZZERAMENTO':
-        this.onEntraManutenzioneSceltaAzzeramento();
-        break;
-
-      case 'FUORI_SERVIZIO':
-        this.onEntraFuoriServizio();
-        break;
-    }
-  }
-
-  /**
-   * Entra in stato IDLE
-   */
-  onEntraIDLE() {
-    // Reset timeout se attivo
-    if (this.gestoreTimeout) {
-      this.gestoreTimeout.reset();
-    }
-
-    // Reset gettoniera
-    if (this.gettoniera) {
-      this.gettoniera.reset();
-    }
-
-    // Reset display
-    if (this.display) {
-      this.display.mostraMessaggioIniziale();
-    }
-
-    // FEATURE 002: Nascondi e resetta pulsante "Persona passata"
-    if (this.display) {
-      this.display.gestisciPulsantePassaggio(false, true);
-    }
-
-    // Riabilita tutti gli input
-    this.abilitaInput(true);
-
-    log.info('🏠 Stato IDLE - Sistema pronto');
-  }
-
-  /**
-   * Entra in stato PAGAMENTO_MONETE
-   */
-  onEntraPagamentoMonete() {
-    // Avvia timeout inattività
-    if (this.gestoreTimeout) {
-      this.gestoreTimeout.avvia();
-    }
-
-    log.info('💰 Pagamento monete iniziato');
-  }
-
-  /**
-   * Entra in stato PAGAMENTO_CARTA
-   */
-  onEntraPagamentoCarta() {
-    // Disabilita altri input
-    this.abilitaInput(false);
-
-    // Mostra area avvicinamento carta
-    if (this.lettoreCarte) {
-      this.lettoreCarte.mostraAreaPagamento();
-    }
-
-    // Mostra messaggio su display
-    if (this.display) {
-      this.display.mostraMessaggio('Avvicina la carta al lettore', 'info');
-    }
-
-    log.info('💳 Pagamento carta iniziato');
-  }
-
-  /**
-   * Entra in stato VERIFICA_QR
-   * @param {string} codice - Codice QR scansionato
-   */
-  onEntraVerificaQR(codice) {
-    // Disabilita tutti gli input
-    this.abilitaInput(false);
-
-    // Usa helper DRY per verifica
-    this.verificaAccessoConCodice(codice, 'QR code');
-  }
-
-  /**
-   * Entra in stato PORTA_APERTA
-   * @param {string} motivo - Motivo apertura (pagamento, qr, carta)
-   */
-  onEntraPortaAperta(motivo = 'pagamento') {
-    // Reset timeout
-    if (this.gestoreTimeout) {
-      this.gestoreTimeout.reset();
-    }
-
-    // Disabilita tutti gli input
-    this.abilitaInput(false);
-
-    // Apri porta con motivo
-    if (this.porta) {
-      this.porta.apri(motivo);
-    }
-
-    // FEATURE 002: Mostra pulsante "Persona passata"
-    if (this.display) {
-      this.display.gestisciPulsantePassaggio(true, true);
-    }
-
-    // Mostra messaggio successo
-    if (this.display) {
-      this.display.mostraMessaggio('Accesso consentito - Porta aperta', 'successo');
-    }
-
-    log.info(`✅ Porta aperta - Motivo: ${motivo}`);
-
-    // FEATURE 002: Programma chiusura automatica e salva timer
-    const timerChiusuraAuto = setTimeout(() => {
-      if (this.porta) {
-        this.porta.chiudi();
-      }
-
-      // Torna a IDLE dopo chiusura
-      setTimeout(() => {
-        this.transizione('IDLE');
-      }, 1500); // Attendi animazione chiusura
-    }, 15000);
-
-    // Salva timer in porta per poterlo cancellare
-    if (this.porta) {
-      this.porta.timerChiusuraAutomatica = timerChiusuraAuto;
-    }
-  }
-
-  /**
-   * Entra in stato TIMEOUT
-   */
-  onEntraTimeout() {
-    log.warn('⏱️ Timeout inattività raggiunto');
-
-    // Mostra messaggio timeout
-    if (this.display) {
-      this.display.mostraMessaggio('Timeout - Operazione annullata', 'warning');
-    }
-
-    // Reset e torna a IDLE dopo 2 secondi
-    setTimeout(() => {
-      this.transizione('IDLE');
-    }, 2000);
-  }
-
-  /**
-   * Abilita/disabilita input
-   * @param {boolean} abilitato - true per abilitare, false per disabilitare
-   * @param {string[]} eccezioni - Input da non modificare
-   */
   /**
    * Abilita/disabilita input
    * Delega a Display
