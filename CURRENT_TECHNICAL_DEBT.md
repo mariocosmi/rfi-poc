@@ -161,42 +161,6 @@ setTimeout(() => { ... }, TIMEOUTS.ANIMAZIONE_PORTA);
 
 ---
 
-### 🟢 TD-A05: Compatibilità - Export `SensoreCassetta` Mancante
-
-**Categoria**: Consistency  
-**Priorità**: BASSA  
-**File**: `sensore-cassetta.js`
-
-#### Problema
-`SensoreCassetta` è l'unica classe che **NON** esporta su `window`:
-```javascript
-// sensore-cassetta.js - manca export!
-class SensoreCassetta { ... }
-// ❌ Nessun window.SensoreCassetta
-
-// Tutti gli altri file:
-window.Chiosco = Chiosco;  // ✅
-window.Display = Display;  // ✅
-```
-
-**Impatti**:
-- Inconsistenza pattern (confusing)
-- Impossibile accedere dalla console browser per debug
-- Potenziale problema se servisse in altri contesti
-
-#### Soluzione
-Aggiungere export:
-```javascript
-// Fine file sensore-cassetta.js
-window.SensoreCassetta = SensoreCassetta;
-log.info('✅ SensoreCassetta caricato');
-```
-
-**Effort stimato**: 5 minuti  
-**Note**: Triviale ma aumenta consistenza codebase
-
----
-
 ## Debiti Risolti (Riferimento)
 
 Questi erano nel report precedente ma sono stati **già risolti**:
@@ -206,6 +170,7 @@ Questi erano nel report precedente ma sono stati **già risolti**:
 - ✅ **Switch Statement Monolitico** → Risolto in Sprint 4 (State Pattern)
 - ✅ **Duplicazione Logica Stati** → Risolto in Sprint 5 (metodi onEntra rimossi)
 - ✅ **Timer Lifecycle** → Risolto in Sprint 5 (esci() in StatoPortaAperta)
+- ✅ **Export SensoreCassetta/GestoreUICassetta** → Risolto (2025-11-27) - Aggiunti export globali per coerenza
 
 ---
 
@@ -213,9 +178,8 @@ Questi erano nel report precedente ma sono stati **già risolti**:
 
 ### Priorità di Intervento
 
-1. **🟢 TD-A05 (Export SensoreCassetta)** - 5 minuti, fallo subito
-2. **🟡 TD-A03 (Magic Numbers Timeout)** - Quick win, alto ROI
-3. **🟡 TD-A02 (Magic Strings Stati)** - Miglioramento manutenibilità
+1. ** TD-A03 (Magic Numbers Timeout)** - Quick win, alto ROI
+2. **🟡 TD-A02 (Magic Strings Stati)** - Miglioramento manutenibilità
 
 ### Note
 - **Non compromettono funzionalità**: Tutti i debiti sono di qualità/manutenibilità

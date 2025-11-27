@@ -111,3 +111,8 @@ class GestoreUICassetta {
     }
   }
 }
+
+// Export globale
+window.GestoreUICassetta = GestoreUICassetta;
+
+log.info('✅ GestoreUICassetta caricato');

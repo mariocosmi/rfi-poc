@@ -148,3 +148,8 @@ class SensoreCassetta {
     });
   }
 }
+
+// Export globale
+window.SensoreCassetta = SensoreCassetta;
+
+log.info('✅ SensoreCassetta caricato');
