@@ -34,6 +34,17 @@ class Stato {
     esci(chiosco) {
         // Default: nessuna azione
     }
+
+    /**
+     * Template method: gestisce input da lettore carte
+     * Override questo metodo negli stati con comportamento specifico
+     * @param {Chiosco} chiosco - Riferimento al contesto
+     * @param {string} codice - Codice carta letto
+     */
+    gestisciInputCarta(chiosco, codice) {
+        // Default: usa helper DRY per verifica normale
+        chiosco.verificaAccessoConCodice(codice, 'Carta');
+    }
 }
 
 class StatoIdle extends Stato {
@@ -141,8 +152,8 @@ class StatoPortaAperta extends Stato {
 
         log.info(`✅ Porta aperta - Motivo: ${motivo}`);
 
-        // FEATURE 002: Programma chiusura automatica e salva timer
-        const timerChiusuraAuto = setTimeout(() => {
+        // FEATURE 002: Programma chiusura automatica - gestito internamente
+        this.timerChiusuraAuto = setTimeout(() => {
             if (chiosco.porta) {
                 chiosco.porta.chiudi();
             }
@@ -152,10 +163,14 @@ class StatoPortaAperta extends Stato {
                 chiosco.transizione('IDLE');
             }, 1500); // Attendi animazione chiusura
         }, 15000);
+    }
 
-        // Salva timer in porta per poterlo cancellare
-        if (chiosco.porta) {
-            chiosco.porta.timerChiusuraAutomatica = timerChiusuraAuto;
+    esci(chiosco) {
+        // Cancella timer se ancora attivo (chiusura manuale)
+        if (this.timerChiusuraAuto) {
+            clearTimeout(this.timerChiusuraAuto);
+            this.timerChiusuraAuto = null;
+            log.debug('⏱️ Timer chiusura automatica cancellato (chiusura manuale)');
         }
     }
 }
@@ -199,6 +214,29 @@ class StatoManutenzioneAuthPending extends Stato {
         }
 
         log.info('🔐 Manutenzione: attesa autenticazione operatore (10s)');
+    }
+
+    gestisciInputCarta(chiosco, codice) {
+        // Autenticazione operatore durante manutenzione
+        if (Validatore.isCodiceAutorizzato(codice)) {
+            chiosco.gestoreManutenzione.fermaCountdown();
+            if (chiosco.operazioneCorrente) {
+                chiosco.operazioneCorrente.logEvento('AUTH_SUCCESS', { codice });
+            }
+            chiosco.transizione('MANUTENZIONE_ATTESA_CHIUSURA');
+        } else {
+            if (chiosco.operazioneCorrente) {
+                chiosco.operazioneCorrente.logEvento('AUTH_FAIL', { codice });
+            }
+            if (chiosco.display) {
+                chiosco.display.mostraMessaggio(`Accesso negato (${codice})`, 'error');
+            }
+            setTimeout(() => {
+                if (chiosco.display) {
+                    chiosco.display.mostraMessaggio('Cassetta aperta - Autenticazione richiesta', 'warning');
+                }
+            }, 2000);
+        }
     }
 }
 
@@ -254,6 +292,11 @@ class StatoFuoriServizio extends Stato {
         }
 
         log.error('🚨 Sistema in FUORI SERVIZIO - Suoneria attivata');
+    }
+
+    gestisciInputCarta(chiosco, codice) {
+        // Reset da FUORI_SERVIZIO
+        chiosco.resetDaFuoriServizio(codice);
     }
 }
 
