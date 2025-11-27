@@ -17,20 +17,20 @@
 
 class Chiosco {
   constructor() {
-    this.stato = 'IDLE';
+    this.stato = STATI.IDLE;
 
     // Transizioni permesse
     this.transizioniPermesse = {
-      'IDLE': ['PAGAMENTO_MONETE', 'PAGAMENTO_CARTA', 'VERIFICA_QR', 'PORTA_APERTA', 'MANUTENZIONE_AUTH_PENDING'],
-      'PAGAMENTO_MONETE': ['PORTA_APERTA', 'TIMEOUT', 'IDLE', 'MANUTENZIONE_AUTH_PENDING'],
-      'PAGAMENTO_CARTA': ['PORTA_APERTA', 'IDLE'],
-      'VERIFICA_QR': ['PORTA_APERTA', 'IDLE'],
-      'PORTA_APERTA': ['IDLE', 'MANUTENZIONE_AUTH_PENDING'],
-      'TIMEOUT': ['IDLE'],
-      'MANUTENZIONE_AUTH_PENDING': ['MANUTENZIONE_ATTESA_CHIUSURA', 'FUORI_SERVIZIO', 'IDLE'],
-      'MANUTENZIONE_ATTESA_CHIUSURA': ['MANUTENZIONE_SCELTA_AZZERAMENTO', 'FUORI_SERVIZIO'],
-      'MANUTENZIONE_SCELTA_AZZERAMENTO': ['IDLE'],
-      'FUORI_SERVIZIO': ['IDLE']
+      [STATI.IDLE]: [STATI.PAGAMENTO_MONETE, STATI.PAGAMENTO_CARTA, STATI.VERIFICA_QR, STATI.PORTA_APERTA, STATI.MANUTENZIONE_AUTH_PENDING],
+      [STATI.PAGAMENTO_MONETE]: [STATI.PORTA_APERTA, STATI.TIMEOUT, STATI.IDLE, STATI.MANUTENZIONE_AUTH_PENDING],
+      [STATI.PAGAMENTO_CARTA]: [STATI.PORTA_APERTA, STATI.IDLE],
+      [STATI.VERIFICA_QR]: [STATI.PORTA_APERTA, STATI.IDLE],
+      [STATI.PORTA_APERTA]: [STATI.IDLE, STATI.MANUTENZIONE_AUTH_PENDING],
+      [STATI.TIMEOUT]: [STATI.IDLE],
+      [STATI.MANUTENZIONE_AUTH_PENDING]: [STATI.MANUTENZIONE_ATTESA_CHIUSURA, STATI.FUORI_SERVIZIO, STATI.IDLE],
+      [STATI.MANUTENZIONE_ATTESA_CHIUSURA]: [STATI.MANUTENZIONE_SCELTA_AZZERAMENTO, STATI.FUORI_SERVIZIO],
+      [STATI.MANUTENZIONE_SCELTA_AZZERAMENTO]: [STATI.IDLE],
+      [STATI.FUORI_SERVIZIO]: [STATI.IDLE]
     };
 
     // Riferimenti ai componenti (saranno impostati da app.js)
@@ -59,19 +59,19 @@ class Chiosco {
 
     // Mappa degli stati (State Pattern)
     this.stati = {
-      'IDLE': new StatoIdle(),
-      'PAGAMENTO_MONETE': new StatoPagamentoMonete(),
-      'PAGAMENTO_CARTA': new StatoPagamentoCarta(),
-      'VERIFICA_QR': new StatoVerificaQR(),
-      'PORTA_APERTA': new StatoPortaAperta(),
-      'TIMEOUT': new StatoTimeout(),
-      'MANUTENZIONE_AUTH_PENDING': new StatoManutenzioneAuthPending(),
-      'MANUTENZIONE_ATTESA_CHIUSURA': new StatoManutenzioneAttesaChiusura(),
-      'MANUTENZIONE_SCELTA_AZZERAMENTO': new StatoManutenzioneSceltaAzzeramento(),
-      'FUORI_SERVIZIO': new StatoFuoriServizio()
+      [STATI.IDLE]: new StatoIdle(),
+      [STATI.PAGAMENTO_MONETE]: new StatoPagamentoMonete(),
+      [STATI.PAGAMENTO_CARTA]: new StatoPagamentoCarta(),
+      [STATI.VERIFICA_QR]: new StatoVerificaQR(),
+      [STATI.PORTA_APERTA]: new StatoPortaAperta(),
+      [STATI.TIMEOUT]: new StatoTimeout(),
+      [STATI.MANUTENZIONE_AUTH_PENDING]: new StatoManutenzioneAuthPending(),
+      [STATI.MANUTENZIONE_ATTESA_CHIUSURA]: new StatoManutenzioneAttesaChiusura(),
+      [STATI.MANUTENZIONE_SCELTA_AZZERAMENTO]: new StatoManutenzioneSceltaAzzeramento(),
+      [STATI.FUORI_SERVIZIO]: new StatoFuoriServizio()
     };
 
-    this.statoCorrente = this.stati['IDLE'];
+    this.statoCorrente = this.stati[STATI.IDLE];
 
     log.info('🏗️ Chiosco inizializzato - Stato: IDLE');
   }
@@ -165,10 +165,10 @@ class Chiosco {
       this.porta.chiudiManuale();
     }
 
-    // Torna a IDLE dopo animazione chiusura (1.5s)
+    // Torna a IDLE dopo animazione chiusura
     setTimeout(() => {
       this.transizione('IDLE');
-    }, 1500);
+    }, TIMEOUTS.RITORNO_IDLE_POST_CHIUSURA);
   }
 
   /**
@@ -259,10 +259,10 @@ class Chiosco {
     // Chiudi operazione manutenzione
     this.operazioneCorrente = null;
 
-    // Torna a IDLE dopo 3 secondi
+    // Torna a IDLE dopo pausa
     setTimeout(() => {
       this.transizione('IDLE');
-    }, 3000);
+    }, TIMEOUTS.TRANSIZIONE_IDLE);
   }
 
   /**
@@ -277,7 +277,7 @@ class Chiosco {
         if (this.display) {
           this.display.mostraFuoriServizio();
         }
-      }, 2000);
+      }, TIMEOUTS.MESSAGGIO_ERRORE);
       return;
     }
 
@@ -293,7 +293,7 @@ class Chiosco {
 
     setTimeout(() => {
       this.transizione('IDLE');
-    }, 3000);
+    }, TIMEOUTS.TRANSIZIONE_IDLE);
 
     log.info(`✅ Reset da FUORI_SERVIZIO - Operatore: ${codiceOperatore}`);
   }
@@ -319,11 +319,11 @@ class Chiosco {
       if (autorizzato) {
         log.info(`✅ ${tipoIngresso} ${codice}: AUTORIZZATO`);
         this.display.mostraMessaggio('Accesso autorizzato', 'successo');
-        setTimeout(() => this.transizione('PORTA_APERTA', { motivo: tipoIngresso.toLowerCase() }), 1000);
+        setTimeout(() => this.transizione('PORTA_APERTA', { motivo: tipoIngresso.toLowerCase() }), TIMEOUTS.MESSAGGIO_SUCCESSO);
       } else {
         log.warn(`⚠️ ${tipoIngresso} ${codice}: NON AUTORIZZATO`);
         this.display.mostraMessaggio('Accesso negato', 'errore');
-        setTimeout(() => this.transizione('IDLE'), 2000);
+        setTimeout(() => this.transizione('IDLE'), TIMEOUTS.MESSAGGIO_ERRORE);
       }
     }, 500);
   }

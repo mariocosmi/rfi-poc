@@ -123,7 +123,7 @@ class OperazioneSvuotamento {
   logEvento(tipo, dettagli = {}) {
     const timestamp = new Date().toISOString();
 
-    switch(tipo) {
+    switch (tipo) {
       case 'APERTURA':
         this.timestampApertura = timestamp;
         log.info(`[Manutenzione] APERTURA - Cassetta aperta`, { timestamp });
@@ -139,7 +139,7 @@ class OperazioneSvuotamento {
         log.warn(`[Manutenzione] AUTH_FAIL - Accesso negato: ${dettagli.codice}`, { timestamp });
         break;
 
-      case 'TIMEOUT':
+      case STATI.TIMEOUT:
         log.error(`[Manutenzione] TIMEOUT - Timeout autenticazione`, { timestamp });
         break;
 
@@ -156,7 +156,7 @@ class OperazioneSvuotamento {
         log.info(`[Manutenzione] AZZERAMENTO - Saldo ${azione}: ${dettagli.saldoPrima.toFixed(2)}€ → ${dettagli.saldoDopo.toFixed(2)}€`, { timestamp });
         break;
 
-      case 'FUORI_SERVIZIO':
+      case STATI.FUORI_SERVIZIO:
         log.error(`[Manutenzione] FUORI_SERVIZIO - Sistema in FUORI SERVIZIO - Suoneria attivata`, { timestamp });
         break;
 

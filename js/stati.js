@@ -48,7 +48,7 @@ class Stato {
 }
 
 class StatoIdle extends Stato {
-    getNome() { return 'IDLE'; }
+    getNome() { return STATI.IDLE; }
 
     entra(chiosco) {
         // Reset timeout se attivo
@@ -76,7 +76,7 @@ class StatoIdle extends Stato {
 }
 
 class StatoPagamentoMonete extends Stato {
-    getNome() { return 'PAGAMENTO_MONETE'; }
+    getNome() { return STATI.PAGAMENTO_MONETE; }
 
     entra(chiosco) {
         // Avvia timeout inattività
@@ -89,7 +89,7 @@ class StatoPagamentoMonete extends Stato {
 }
 
 class StatoPagamentoCarta extends Stato {
-    getNome() { return 'PAGAMENTO_CARTA'; }
+    getNome() { return STATI.PAGAMENTO_CARTA; }
 
     entra(chiosco) {
         // Disabilita altri input
@@ -110,7 +110,7 @@ class StatoPagamentoCarta extends Stato {
 }
 
 class StatoVerificaQR extends Stato {
-    getNome() { return 'VERIFICA_QR'; }
+    getNome() { return STATI.VERIFICA_QR; }
 
     entra(chiosco, dati) {
         // Disabilita tutti gli input
@@ -122,7 +122,7 @@ class StatoVerificaQR extends Stato {
 }
 
 class StatoPortaAperta extends Stato {
-    getNome() { return 'PORTA_APERTA'; }
+    getNome() { return STATI.PORTA_APERTA; }
 
     entra(chiosco, dati) {
         const motivo = dati.motivo || 'pagamento';
@@ -160,9 +160,9 @@ class StatoPortaAperta extends Stato {
 
             // Torna a IDLE dopo chiusura
             setTimeout(() => {
-                chiosco.transizione('IDLE');
-            }, 1500); // Attendi animazione chiusura
-        }, 15000);
+                chiosco.transizione(STATI.IDLE);
+            }, TIMEOUTS.RITORNO_IDLE_POST_CHIUSURA);
+        }, TIMEOUTS.CHIUSURA_PORTA_AUTO);
     }
 
     esci(chiosco) {
@@ -176,7 +176,7 @@ class StatoPortaAperta extends Stato {
 }
 
 class StatoTimeout extends Stato {
-    getNome() { return 'TIMEOUT'; }
+    getNome() { return STATI.TIMEOUT; }
 
     entra(chiosco) {
         log.warn('⏱️ Timeout inattività raggiunto');
@@ -188,13 +188,13 @@ class StatoTimeout extends Stato {
 
         // Reset e torna a IDLE dopo 2 secondi
         setTimeout(() => {
-            chiosco.transizione('IDLE');
-        }, 2000);
+            chiosco.transizione(STATI.IDLE);
+        }, TIMEOUTS.RITORNO_IDLE_POST_TIMEOUT);
     }
 }
 
 class StatoManutenzioneAuthPending extends Stato {
-    getNome() { return 'MANUTENZIONE_AUTH_PENDING'; }
+    getNome() { return STATI.MANUTENZIONE_AUTH_PENDING; }
 
     entra(chiosco) {
         // Disabilita tutti input TRANNE lettore carte (serve per autenticazione operatore)
@@ -204,9 +204,9 @@ class StatoManutenzioneAuthPending extends Stato {
 
         chiosco.gestoreManutenzione.avviaCountdown(() => {
             if (chiosco.operazioneCorrente) {
-                chiosco.operazioneCorrente.logEvento('TIMEOUT');
+                chiosco.operazioneCorrente.logEvento(STATI.TIMEOUT);
             }
-            chiosco.transizione('FUORI_SERVIZIO');
+            chiosco.transizione(STATI.FUORI_SERVIZIO);
         });
 
         if (chiosco.display) {
@@ -223,7 +223,7 @@ class StatoManutenzioneAuthPending extends Stato {
             if (chiosco.operazioneCorrente) {
                 chiosco.operazioneCorrente.logEvento('AUTH_SUCCESS', { codice });
             }
-            chiosco.transizione('MANUTENZIONE_ATTESA_CHIUSURA');
+            chiosco.transizione(STATI.MANUTENZIONE_ATTESA_CHIUSURA);
         } else {
             if (chiosco.operazioneCorrente) {
                 chiosco.operazioneCorrente.logEvento('AUTH_FAIL', { codice });
@@ -235,13 +235,13 @@ class StatoManutenzioneAuthPending extends Stato {
                 if (chiosco.display) {
                     chiosco.display.mostraMessaggio('Cassetta aperta - Autenticazione richiesta', 'warning');
                 }
-            }, 2000);
+            }, TIMEOUTS.MESSAGGIO_ERRORE);
         }
     }
 }
 
 class StatoManutenzioneAttesaChiusura extends Stato {
-    getNome() { return 'MANUTENZIONE_ATTESA_CHIUSURA'; }
+    getNome() { return STATI.MANUTENZIONE_ATTESA_CHIUSURA; }
 
     entra(chiosco) {
         chiosco.gestoreManutenzione.fermaCountdown();
@@ -261,7 +261,7 @@ class StatoManutenzioneAttesaChiusura extends Stato {
 }
 
 class StatoManutenzioneSceltaAzzeramento extends Stato {
-    getNome() { return 'MANUTENZIONE_SCELTA_AZZERAMENTO'; }
+    getNome() { return STATI.MANUTENZIONE_SCELTA_AZZERAMENTO; }
 
     entra(chiosco) {
         const saldo = chiosco.gettoniera ? chiosco.gettoniera.getSaldoMonete() : 0;
@@ -275,7 +275,7 @@ class StatoManutenzioneSceltaAzzeramento extends Stato {
 }
 
 class StatoFuoriServizio extends Stato {
-    getNome() { return 'FUORI_SERVIZIO'; }
+    getNome() { return STATI.FUORI_SERVIZIO; }
 
     entra(chiosco) {
         chiosco.suoneria.attiva();
@@ -288,7 +288,7 @@ class StatoFuoriServizio extends Stato {
         }
 
         if (chiosco.operazioneCorrente) {
-            chiosco.operazioneCorrente.logEvento('FUORI_SERVIZIO');
+            chiosco.operazioneCorrente.logEvento(STATI.FUORI_SERVIZIO);
         }
 
         log.error('🚨 Sistema in FUORI SERVIZIO - Suoneria attivata');

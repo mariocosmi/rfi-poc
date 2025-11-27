@@ -55,7 +55,7 @@
 
     // Crea chiosco (FSM principale)
     const chiosco = new Chiosco();
-    const gestoreTimeout = new GestoreTimeout(chiosco, 20);
+    const gestoreTimeout = new GestoreTimeout(chiosco, TIMEOUTS.TIMEOUT_INATTIVITA_SECONDI);
 
     // Collega componenti al chiosco
     chiosco.display = display;
@@ -100,12 +100,12 @@
     // 1. Pulsanti Monete
     display.bindCoinButtons((valore) => {
       // Se siamo in IDLE, passa a PAGAMENTO_MONETE
-      if (chiosco.stato === 'IDLE') {
-        chiosco.transizione('PAGAMENTO_MONETE');
+      if (chiosco.stato === STATI.IDLE) {
+        chiosco.transizione(STATI.PAGAMENTO_MONETE);
       }
 
       // Se siamo in PAGAMENTO_MONETE, inserisci moneta
-      if (chiosco.stato === 'PAGAMENTO_MONETE') {
+      if (chiosco.stato === STATI.PAGAMENTO_MONETE) {
         const successo = gettoniera.inserisciMoneta(valore);
 
         if (successo) {
@@ -126,8 +126,8 @@
 
     // 2. Pagamento Carta (VISA)
     display.bindCardButton(() => {
-      if (chiosco.stato === 'IDLE') {
-        chiosco.transizione('PAGAMENTO_CARTA');
+      if (chiosco.stato === STATI.IDLE) {
+        chiosco.transizione(STATI.PAGAMENTO_CARTA);
       } else {
         log.warn('⚠️ Pagamento carta richiesto ma stato non è IDLE');
       }
@@ -142,7 +142,7 @@
     // 4. Scansione QR (Input + Bottone)
     display.bindQRInput((codice) => {
       log.debug(`🖱️ Scansione QR: "${codice}"`);
-      chiosco.transizione('VERIFICA_QR', { codice });
+      chiosco.transizione(STATI.VERIFICA_QR, { codice });
     });
 
     // 5. Passaggio Persona

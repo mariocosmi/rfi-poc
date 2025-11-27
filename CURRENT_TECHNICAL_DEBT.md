@@ -68,35 +68,6 @@ function createAppComponents() {
 
 ## Debiti Tecnici Attivi
 
-### 🟡 TD-A02: Qualità Codice - Magic Strings per Stati
-
-**Categoria**: Manutenibilità
-**Priorità**: MEDIA
-**File coinvolti**: `chiosco.js`, `app.js`, `stati.js`
-
-#### Problema
-I nomi degli stati sono stringhe hardcoded sparse nel codice:
-```javascript
-// chiosco.js
-this.stato = 'IDLE';  // ❌ Magic string
-if (chiosco.stato === 'IDLE') { ... }  // ❌ Rischio typo
-
-// Mappa transizioni con stringhe ripetute
-this.transizioniPermesse = {
-  'IDLE': ['PAGAMENTO_MONETE', 'PAGAMENTO_CARTA', ...],
-  'PAGAMENTO_MONETE': ['PORTA_APERTA', 'TIMEOUT', 'IDLE', ...],
-  // ... 50+ occorrenze totali
-};
-```
-
-**Rischi**:
-- Typo silenti (nessun errore a compile-time)
-- Refactoring difficile (find & replace rischioso)
-- Nessun autocomplete IDE
-
-#### Soluzione Proposta
-Creare `constants.js` con pattern globale:
-```javascript
 // constants.js
 const STATI = Object.freeze({
   IDLE: 'IDLE',
@@ -116,49 +87,6 @@ this.stato = STATI.IDLE;  // ✅ Autocomplete + type safe
 
 ---
 
-### 🟡 TD-A03: Qualità Codice - Magic Numbers per Timeout
-
-**Categoria**: Configurabilità  
-**Priorità**: MEDIA  
-**File coinvolti**: `chiosco.js`, `stati.js`, `app.js`
-
-#### Problema
-Valori di timeout sparsi come magic numbers:
-```javascript
-// chiosco.js
-setTimeout(() => { ... }, 1500);  // ❌ Cosa significa?
-setTimeout(() => { ... }, 3000);  // ❌ Duplicato in più punti
-
-// stati.js
-}, 15000);  // ❌ Chiusura porta
-}, 2000);   // ❌ Timeout messaggio
-```
-
-**Impatti**:
-- Difficile capire la logica temporale
-- Modifiche richiedono find & replace
-- Testing (velocizzazione simulazioni)
-- Nessuna configurazione centralizzata
-
-#### Soluzione Proposta
-```javascript
-// constants.js
-export const TIMEOUTS = Object.freeze({
-  CHIUSURA_PORTA_AUTO: 15000,        // 15s
-  TRANSIZIONE_IDLE: 3000,            // 3s
-  ANIMAZIONE_PORTA: 1500,            // 1.5s
-  MESSAGGIO_TEMPORANEO: 2000,        // 2s
-  TIMEOUT_INATTIVITA: 20000,         // 20s (default)
-  // ...
-});
-
-// Uso:
-setTimeout(() => { ... }, TIMEOUTS.ANIMAZIONE_PORTA);
-```
-
-**Effort stimato**: 1-2h  
-**Benefici**: Configurazione centralizzata, testing semplificato
-
 ---
 
 ## Debiti Risolti (Riferimento)
@@ -171,6 +99,8 @@ Questi erano nel report precedente ma sono stati **già risolti**:
 - ✅ **Duplicazione Logica Stati** → Risolto in Sprint 5 (metodi onEntra rimossi)
 - ✅ **Timer Lifecycle** → Risolto in Sprint 5 (esci() in StatoPortaAperta)
 - ✅ **Export SensoreCassetta/GestoreUICassetta** → Risolto (2025-11-27) - Aggiunti export globali per coerenza
+- ✅ **Magic Numbers Timeout** → Risolto (2025-11-27) - Centralizzati in `constants.js` (TD-A03)
+- ✅ **Magic Strings Stati** → Risolto (2025-11-27) - Sostituite con `STATI.*` (TD-A02)
 
 ---
 
@@ -178,8 +108,7 @@ Questi erano nel report precedente ma sono stati **già risolti**:
 
 ### Priorità di Intervento
 
-1. ** TD-A03 (Magic Numbers Timeout)** - Quick win, alto ROI
-2. **🟡 TD-A02 (Magic Strings Stati)** - Miglioramento manutenibilità
+*Nessun debito tecnico attivo ad alta/media priorità rimasto!* 🎉
 
 ### Note
 - **Non compromettono funzionalità**: Tutti i debiti sono di qualità/manutenibilità

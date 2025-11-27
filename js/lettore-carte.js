@@ -110,20 +110,20 @@ class LettoreCarte {
         this.chiosco.display.mostraMessaggio('Pagamento accettato', 'successo');
         setTimeout(() => {
           this.chiosco.transizione('PORTA_APERTA', { motivo: 'carta' });
-        }, 1000);
+        }, TIMEOUTS.MESSAGGIO_SUCCESSO);
       } else {
         log.warn('⚠️ Transazione carta: RIFIUTATA');
         this.statoTransazione = 'RIFIUTATA';
         this.chiosco.display.mostraMessaggio('Pagamento rifiutato - Riprova', 'errore');
         setTimeout(() => {
           this.chiosco.transizione('IDLE');
-        }, 2000);
+        }, TIMEOUTS.MESSAGGIO_ERRORE);
       }
 
       // Nascondi area
       this.areaCartaPagamento.classList.add('hidden');
       this.modalita = null;
-    }, 1500);
+    }, TIMEOUTS.ELABORAZIONE_PAGAMENTO_CARTA);
   }
 
   /**

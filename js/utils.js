@@ -24,7 +24,7 @@ function aggiungiAnimazioneClick(elemento, nomeAzione = null) {
 
   // Animazione CSS
   elemento.classList.add('clicked');
-  setTimeout(() => elemento.classList.remove('clicked'), 200);
+  setTimeout(() => elemento.classList.remove('clicked'), TIMEOUTS.ANIMAZIONE_CLICK);
 }
 
 /**
@@ -45,7 +45,7 @@ function registraClickHandler(elementId, handler, nomeAzione = null, animazione 
     return null;
   }
 
-  elemento.addEventListener('click', function(e) {
+  elemento.addEventListener('click', function (e) {
     // Animazione + log (se richiesti)
     if (animazione) {
       aggiungiAnimazioneClick(this, nomeAzione);
