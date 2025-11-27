@@ -66,7 +66,7 @@ Questo documento traccia il debito tecnico identificato nel progetto, in partico
 - Polishing finale codebase bassa priorità completato
 
 ### ✅ Sprint 4 (2025-11-24) - Refactoring Architetturale
-**Commit**: `[in corso]`
+**Commit**: `c597884`, `3674091`, `331b97b`, `ec2cd42`, `3adcf94`
 **Effort**: 5h
 **Violazioni risolte**: TD-010, TD-011, TD-012
 
@@ -75,6 +75,12 @@ Questo documento traccia il debito tecnico identificato nel progetto, in partico
 - ✅ TD-011: Refactored `Chiosco` e `Display`. Spostata logica UI in `Display`. Disaccoppiamento completo.
 - ✅ TD-012: Refactored `Chiosco` con State Pattern. Eliminato switch monolitico.
 - ✅ Test E2E: 57/57 passati, 0 regressioni.
+
+**Benefici**:
+- Precisione monetaria garantita (interi vs float)
+- Testabilità migliorata (UI disaccoppiata)
+- Estendibilità stati (Open/Closed Principle)
+- Riduzione complessità ciclomatica
 
 ---
 
@@ -128,6 +134,102 @@ Questo documento traccia il debito tecnico identificato nel progetto, in partico
 
 ---
 
+### 🔄 TD-013: Duplicazione Logica Stati (metodi onEntra*()) - IN CORSO
+**Status**: 🔄 Sprint 5 in corso
+**Priorità**: 🔴 ALTA
+**File**: `js/chiosco.js` (linee 271-374)
+**Effort**: ~1h
+
+**Problema**:
+Metodi `onEntraManutenzioneAuthPending()`, `onEntraManutenzioneAttesaChiusura()`, `onEntraManutenzioneSceltaAzzeramento()`, `onEntraFuoriServizio()` in `chiosco.js` duplicano logica già presente in `js/stati.js`. Doppia fonte di verità per comportamento stati.
+
+**Soluzione**:
+Rimuovere completamente metodi `onEntra*()` da `chiosco.js`. Il State Pattern in `stati.js` è l'unica fonte di verità.
+
+**Benefici attesi**:
+- Eliminazione ~100 linee duplicate
+- Single source of truth per logica stati
+- Riduzione rischio inconsistenze future
+
+---
+
+### 🔄 TD-014: Timer Lifecycle Management - IN CORSO
+**Status**: 🔄 Sprint 5 in corso
+**Priorità**: 🟡 MEDIA
+**File**: `js/stati.js` (linea 158)
+**Effort**: ~30min
+
+**Problema**:
+In `StatoPortaAperta.entra()`, il timer viene salvato su proprietà componente esterno:
+```javascript
+chiosco.porta.timerChiusuraAutomatica = timerChiusuraAuto;
+```
+Viola encapsulamento - lo stato modifica direttamente proprietà interne di altri componenti.
+
+**Soluzione**:
+Gestire timer lifecycle nello stato stesso con metodo `esci()`:
+```javascript
+class StatoPortaAperta extends Stato {
+    entra(chiosco, dati) {
+        this.timerChiusuraAuto = setTimeout(...);
+    }
+    esci(chiosco) {
+        if (this.timerChiusuraAuto) {
+            clearTimeout(this.timerChiusuraAuto);
+            this.timerChiusuraAuto = null;
+        }
+    }
+}
+```
+
+**Benefici attesi**:
+- Migliore encapsulamento
+- Lifecycle timer più esplicito
+- Prevenzione timer "orfani"
+- Maggiore testabilità
+
+---
+
+### 🔄 TD-015: Conditional Logic in Context (verificaCarta) - IN CORSO
+**Status**: 🔄 Sprint 5 in corso
+**Priorità**: 🟡 MEDIA
+**File**: `js/chiosco.js` (linee 409-442)
+**Effort**: ~1h
+
+**Problema**:
+Metodo `verificaCarta()` ha logica condizionale basata su stato corrente:
+```javascript
+verificaCarta(codice) {
+    if (this.stato === 'FUORI_SERVIZIO') { ... }
+    else if (this.stato === 'MANUTENZIONE_AUTH_PENDING') { ... }
+    else { ... }
+}
+```
+Anti-pattern State Pattern - il context non dovrebbe fare switch sullo stato.
+
+**Soluzione**:
+Spostare logica negli stati con template method `gestisciInputCarta()`:
+```javascript
+class Stato {
+    gestisciInputCarta(chiosco, codice) {
+        chiosco.verificaAccessoConCodice(codice, 'Carta');  // Default
+    }
+}
+class StatoFuoriServizio extends Stato {
+    gestisciInputCarta(chiosco, codice) {
+        chiosco.resetDaFuoriServizio(codice);  // Override
+    }
+}
+```
+
+**Benefici attesi**:
+- Completa migrazione a State Pattern
+- Eliminazione conditional logic dal context
+- Ogni stato incapsula completamente il proprio comportamento
+- Più facile aggiungere nuovi stati
+
+---
+
 ## Violazioni Media Priorità
 <...rest of file...>
 
@@ -139,6 +241,12 @@ Questo documento traccia il debito tecnico identificato nel progetto, in partico
 ### ✅ Sprint 4 (Refactoring Architetturale) - COMPLETATO
 - [x] TD-010: Precisione Valuta
 - [x] TD-011: Accoppiamento UI
+- [x] TD-012: State Pattern
+
+### 🔄 Sprint 5 (State Pattern Polishing) - IN CORSO
+- [ ] TD-013: Duplicazione logica stati (metodi onEntra*())
+- [ ] TD-014: Timer lifecycle management
+- [ ] TD-015: Conditional logic in context
 
 
 ### ✅ TD-004: Pattern Log Click (9 occorrenze) - COMPLETATO
@@ -224,6 +332,23 @@ Questo documento traccia il debito tecnico identificato nel progetto, in partico
 
 **Outcome Pianificato**: Polishing finale codebase
 **Outcome Effettivo**: Cleanup completato, -12 linee, consistenza utils.js migliorata, 0 regressioni
+
+### 🔄 Sprint 5 (2025-11-27) - State Pattern Polishing
+**Commit**: `[in corso]`
+**Effort**: 2.5h pianificate
+**Violazioni da risolvere**: TD-013, TD-014, TD-015
+
+**Obiettivi**:
+- Completare migrazione a State Pattern al 100%
+- Eliminare duplicazione logica stati (~100 linee)
+- Migliorare encapsulamento timer lifecycle
+- Rimuovere conditional logic residua dal context
+
+**Outcome atteso**:
+- Riduzione codebase: ~100 linee
+- Cyclomatic complexity Chiosco: 12 → 6 (-50%)
+- State Pattern coverage: 85% → 100%
+- Test E2E: 57/57 passati, 0 regressioni
 
 ---
 
