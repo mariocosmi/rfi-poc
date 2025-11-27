@@ -306,6 +306,119 @@ class Display {
     const spinner = document.getElementById(id);
     if (spinner) spinner.remove();
   }
+
+  // ===== BINDING EVENTI (Refactoring Init) =====
+
+  /**
+   * Collega handler ai pulsanti monete
+   * @param {Function} handler - Callback (valore) => {}
+   */
+  bindCoinButtons(handler) {
+    const pulsantiMonete = document.querySelectorAll('.btn-moneta');
+    pulsantiMonete.forEach(btn => {
+      btn.addEventListener('click', function () {
+        const valore = parseFloat(this.getAttribute('data-valore'));
+        aggiungiAnimazioneClick(this, `Moneta ${valore}€`);
+        handler(valore);
+      });
+    });
+  }
+
+  /**
+   * Collega handler al pulsante "Paga con Carta"
+   * @param {Function} handler - Callback () => {}
+   */
+  bindCardButton(handler) {
+    registraClickHandler('btn-paga-carta', handler, 'Paga con Carta');
+  }
+
+  /**
+   * Collega handler per verifica carta (input + bottone)
+   * @param {Function} handler - Callback (codice) => {}
+   */
+  bindCardInput(handler) {
+    const inputCarta = document.getElementById('input-carta');
+    if (!inputCarta) return;
+
+    const wrapperHandler = () => {
+      const codice = inputCarta.value.trim();
+      if (!codice) {
+        log.warn('⚠️ Codice carta vuoto');
+        this.mostraMessaggio('Inserisci un codice carta', 'warning');
+        return;
+      }
+
+      const btnVerificaCarta = document.getElementById('btn-verifica-carta');
+      if (btnVerificaCarta) aggiungiAnimazioneClick(btnVerificaCarta);
+
+      handler(codice);
+      inputCarta.value = '';
+    };
+
+    registraClickHandler('btn-verifica-carta', wrapperHandler, null, false);
+
+    inputCarta.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') wrapperHandler();
+    });
+  }
+
+  /**
+   * Collega handler per scansione QR (input + bottone)
+   * @param {Function} handler - Callback (codice) => {}
+   */
+  bindQRInput(handler) {
+    const inputQR = document.getElementById('input-qr');
+    if (!inputQR) return;
+
+    const wrapperHandler = () => {
+      const codice = inputQR.value.trim();
+      if (!codice) {
+        log.warn('⚠️ Codice QR vuoto');
+        this.mostraMessaggio('Inserisci un codice QR', 'warning');
+        return;
+      }
+
+      const btnScansioneQR = document.getElementById('btn-scansiona-qr');
+      if (btnScansioneQR) aggiungiAnimazioneClick(btnScansioneQR);
+
+      handler(codice);
+      inputQR.value = '';
+    };
+
+    registraClickHandler('btn-scansiona-qr', wrapperHandler, null, false);
+
+    inputQR.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') wrapperHandler();
+    });
+  }
+
+  /**
+   * Collega handler al pulsante "Persona passata"
+   * @param {Function} handler - Callback () => {}
+   */
+  bindPassaggioPersona(handler) {
+    registraClickHandler('btn-passaggio-persona', handler, 'Persona passata');
+  }
+
+  /**
+   * Collega handler ai pulsanti azzeramento
+   * @param {Function} onYes - Callback conferma
+   * @param {Function} onNo - Callback annulla
+   */
+  bindAzzeramentoButtons(onYes, onNo) {
+    registraClickHandler('btn-azzera-si', onYes, 'Azzera Saldo - Sì');
+    registraClickHandler('btn-azzera-no', onNo, 'Azzera Saldo - No');
+  }
+
+  /**
+   * Collega handler al pulsante "Chiudi Cassetta"
+   * @param {Function} handler - Callback () => {}
+   */
+  bindChiudiCassetta(handler) {
+    // Nota: questo pulsante è gestito da GestoreUICassetta ma lo aggiungiamo per completezza
+    // se in futuro volessimo spostare la logica qui
+    registraClickHandler('btn-chiudi-cassetta', handler, 'Chiudi Cassetta');
+  }
 }
 
 // Export globale
