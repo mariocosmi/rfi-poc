@@ -37,6 +37,33 @@ window.Chiosco = Chiosco;
 
 **Conclusione**: Pattern `window.*` è la scelta **corretta** per questo progetto, non un debito tecnico.
 
+### ⚪ Dependency Injection Manuale - Pattern Corretto
+
+**Decisione**: Il wiring manuale delle dipendenze in `createAppComponents()` è il pattern appropriato per questo progetto.
+
+```javascript
+// app.js - Pattern attuale (mantenuto):
+function createAppComponents() {
+  const chiosco = new Chiosco();
+  chiosco.display = display;
+  chiosco.porta = porta;
+  // ... wiring esplicito
+}
+```
+
+**Motivazioni**:
+1. ✅ **Chiaro e leggibile** - 25 righe per 9 componenti è ragionevole
+2. ✅ **Manutenibile** - Aggiungere un componente = 3 righe
+3. ✅ **Test E2E funzionano** - 57/57 senza mock complessi
+4. ✅ **YAGNI** - DI container sarebbe over-engineering
+
+**Alternativa rifiutata (DI Container/Factory)**:
+- ❌ Boilerplate eccessivo per progetto di questa dimensione
+- ❌ Beneficio marginale vs. effort (3-4h)
+- ❌ Aggiunge complessità senza risolvere problemi reali
+
+**Quando riconsiderare**: Solo se componenti superano 15-20 e grafo dipendenze diventa non gestibile.
+
 ---
 
 ## Debiti Tecnici Attivi
@@ -134,50 +161,6 @@ setTimeout(() => { ... }, TIMEOUTS.ANIMAZIONE_PORTA);
 
 ---
 
-### 🟢 TD-A04: Architettura - Dependency Injection Manuale
-
-**Categoria**: Testabilità  
-**Priorità**: BASSA  
-**File coinvolti**: `app.js`
-
-#### Problema
-Il wiring delle dipendenze è completamente manuale in `createAppComponents()`:
-```javascript
-// app.js - wiring imperativo
-const chiosco = new Chiosco();
-chiosco.display = display;
-chiosco.porta = porta;
-chiosco.gettoniera = gettoniera;
-// ... 10+ assegnazioni manuali
-```
-
-**Impatti**:
-- Setup verboso
-- Testing richiede mock pesanti
-- Difficile capire grafo dipendenze
-
-#### Soluzione Proposta
-Introdurre lightweight DI container o Factory Pattern:
-```javascript
-// container.js (opzione 1)
-export class Container {
-  register(name, factory) { ... }
-  get(name) { ... }
-}
-
-// factory.js (opzione 2 - più semplice)
-export function createApp(config = {}) {
-  const display = config.display || new Display();
-  const chiosco = new Chiosco({ display, porta: config.porta || new Porta() });
-  return { chiosco, display, ... };
-}
-```
-
-**Effort stimato**: 3-4h  
-**Note**: BASSA priorità - pattern attuale funziona, refactoring non urgente
-
----
-
 ### 🟢 TD-A05: Compatibilità - Export `SensoreCassetta` Mancante
 
 **Categoria**: Consistency  
@@ -233,7 +216,6 @@ Questi erano nel report precedente ma sono stati **già risolti**:
 1. **🟢 TD-A05 (Export SensoreCassetta)** - 5 minuti, fallo subito
 2. **🟡 TD-A03 (Magic Numbers Timeout)** - Quick win, alto ROI
 3. **🟡 TD-A02 (Magic Strings Stati)** - Miglioramento manutenibilità
-4. **🟢 TD-A04 (DI)** - Nice-to-have, non urgente
 
 ### Note
 - **Non compromettono funzionalità**: Tutti i debiti sono di qualità/manutenibilità
